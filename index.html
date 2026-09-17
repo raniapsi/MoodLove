@@ -17,46 +17,29 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@400;500;600;700&family=Caveat:wght@500;600;700&display=swap">
 <style>
 :root{
-  --bg-a:#FFE9F0;
-  --bg-b:#F1E6FF;
-  --surface:#FFFBF8;
-  --surface-2:#FFF1F6;
-  --ink:#4A2E45;
-  --ink-soft:#8C6B87;
-  --rose:#FF6FA0;
-  --rose-deep:#E84A88;
-  --gold:#F0B95F;
-  --border:rgba(74,46,69,0.1);
-  --shadow:rgba(232,74,136,0.22);
-  --sheet-scrim:rgba(74,46,69,0.35);
-  --danger:#D45A6B;
+  --bg-a:#FFE9F0; --bg-b:#F1E6FF;
+  --surface:#FFFBF8; --surface-2:#FFF1F6;
+  --ink:#4A2E45; --ink-soft:#8C6B87;
+  --rose:#FF6FA0; --rose-deep:#E84A88; --gold:#F0B95F;
+  --border:rgba(74,46,69,0.1); --shadow:rgba(232,74,136,0.22);
+  --sheet-scrim:rgba(74,46,69,0.35); --danger:#D45A6B; --ok:#4FA97E;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg-a:#231320;
-    --bg-b:#2A1D3B;
-    --surface:#32202F;
-    --surface-2:#3B2536;
-    --ink:#FBEAF2;
-    --ink-soft:#D3AFC9;
-    --rose:#FF8FB8;
-    --rose-deep:#FFA9CC;
-    --gold:#F0C179;
-    --border:rgba(255,255,255,0.1);
-    --shadow:rgba(0,0,0,0.45);
-    --sheet-scrim:rgba(10,4,9,0.55);
-    --danger:#FF9AA6;
+    --bg-a:#231320; --bg-b:#2A1D3B;
+    --surface:#32202F; --surface-2:#3B2536;
+    --ink:#FBEAF2; --ink-soft:#D3AFC9;
+    --rose:#FF8FB8; --rose-deep:#FFA9CC; --gold:#F0C179;
+    --border:rgba(255,255,255,0.1); --shadow:rgba(0,0,0,0.45);
+    --sheet-scrim:rgba(10,4,9,0.55); --danger:#FF9AA6; --ok:#7FD3A9;
   }
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;}
 body{
-  margin:0;
-  background:radial-gradient(circle at 30% 0%, var(--bg-b), var(--bg-a) 60%);
-  color:var(--ink);
-  font-family:'Quicksand',system-ui,sans-serif;
-  display:flex; align-items:center; justify-content:center;
-  overscroll-behavior:none;
+  margin:0; background:radial-gradient(circle at 30% 0%, var(--bg-b), var(--bg-a) 60%);
+  color:var(--ink); font-family:'Quicksand',system-ui,sans-serif;
+  display:flex; align-items:center; justify-content:center; overscroll-behavior:none;
 }
 .phone{
   position:relative; width:100%; max-width:440px; height:100dvh;
@@ -67,7 +50,6 @@ body{
   .phone{height:min(820px,92vh); border-radius:36px; box-shadow:0 30px 60px -20px var(--shadow);}
 }
 
-/* ---------- Écrans pleins ---------- */
 .fullscreen{
   position:absolute; inset:0; z-index:80; background:var(--surface);
   display:none; flex-direction:column; justify-content:center;
@@ -77,10 +59,10 @@ body{
 .ob-brand{font-family:'Fredoka',sans-serif; font-size:2.1rem; color:var(--rose-deep); text-align:center; margin-bottom:2px;}
 .ob-sub{font-family:'Caveat',cursive; font-size:1.3rem; color:var(--ink-soft); text-align:center; margin-bottom:24px;}
 .field-label{font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:var(--ink-soft); margin:0 0 6px 3px;}
-input[type="text"],input[type="email"],input[type="password"]{
-  width:100%; border:1.5px solid var(--border); border-radius:13px;
-  padding:12px 13px; font-family:'Quicksand',sans-serif; font-size:.95rem;
-  background:var(--surface-2); color:var(--ink); margin-bottom:14px;
+input[type="text"],input[type="email"],input[type="password"],input[type="search"]{
+  width:100%; border:1.5px solid var(--border); border-radius:13px; padding:12px 13px;
+  font-family:'Quicksand',sans-serif; font-size:.95rem;
+  background:var(--surface-2); color:var(--ink); margin-bottom:14px; -webkit-appearance:none;
 }
 input:focus{outline:none; border-color:var(--rose);}
 .primary-btn{
@@ -95,15 +77,11 @@ input:focus{outline:none; border-color:var(--rose);}
   font-family:'Quicksand',sans-serif; font-weight:700; font-size:.85rem;
   padding:14px 4px 0; width:100%; text-align:center;
 }
-.auth-error{
-  color:var(--danger); font-size:.82rem; font-weight:600; text-align:center;
-  margin:10px 0 0; min-height:1em; line-height:1.4;
-}
+.auth-error{color:var(--danger); font-size:.82rem; font-weight:600; text-align:center; margin:10px 0 0; min-height:1em; line-height:1.4;}
 .emoji-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-bottom:8px;}
 .emoji-opt{
-  aspect-ratio:1; border-radius:13px; border:2px solid var(--border);
-  background:var(--surface-2); font-size:1.35rem; cursor:pointer;
-  display:flex; align-items:center; justify-content:center; padding:0;
+  aspect-ratio:1; border-radius:13px; border:2px solid var(--border); background:var(--surface-2);
+  font-size:1.35rem; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;
 }
 .emoji-opt.selected{border-color:var(--rose); background:color-mix(in srgb,var(--rose) 14%,var(--surface-2));}
 
@@ -116,7 +94,6 @@ input:focus{outline:none; border-color:var(--rose);}
 @keyframes pulse{0%,100%{transform:scale(1); opacity:.7;} 50%{transform:scale(1.18); opacity:1;}}
 .load-text{font-family:'Caveat',cursive; font-size:1.2rem; color:var(--ink-soft);}
 
-/* ---------- App ---------- */
 .app-header{
   padding:calc(14px + env(safe-area-inset-top)) 18px 12px;
   display:flex; align-items:center; justify-content:space-between; flex-shrink:0;
@@ -124,13 +101,19 @@ input:focus{outline:none; border-color:var(--rose);}
 .brand{display:flex; align-items:center; gap:7px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:1.3rem; color:var(--rose-deep);}
 .header-actions{display:flex; align-items:center; gap:6px;}
 .streak-chip,.icon-btn{
-  display:flex; align-items:center; gap:4px;
-  background:var(--surface-2); border:1px solid var(--border); color:var(--ink);
+  display:flex; align-items:center; gap:4px; background:var(--surface-2);
+  border:1px solid var(--border); color:var(--ink);
   font-family:'Quicksand',sans-serif; font-weight:700; font-size:.85rem;
   padding:7px 10px; border-radius:999px; cursor:pointer;
 }
-.icon-btn{padding:7px 9px; font-size:.95rem;}
+.icon-btn{padding:7px 9px; font-size:.95rem; position:relative;}
 .streak-chip.hot{border-color:var(--gold); background:color-mix(in srgb,var(--gold) 20%,var(--surface-2));}
+.badge{
+  position:absolute; top:-4px; right:-4px; min-width:17px; height:17px; padding:0 4px;
+  border-radius:999px; background:var(--rose-deep); color:#fff;
+  font-size:.62rem; font-weight:700; display:none; align-items:center; justify-content:center;
+}
+.badge.show{display:flex;}
 button:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
 
 .view{flex:1; overflow-y:auto; padding:2px 18px 120px; -webkit-overflow-scrolling:touch;}
@@ -142,28 +125,23 @@ button:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
 .section-label:first-child{margin-top:4px;}
 
 .my-card{
-  border-radius:22px; padding:15px;
-  background:linear-gradient(140deg,var(--surface-2),var(--surface));
+  border-radius:22px; padding:15px; background:linear-gradient(140deg,var(--surface-2),var(--surface));
   border:1px solid var(--border); display:flex; align-items:center; gap:13px;
 }
 .petit-ami-card{
   position:relative; border-radius:24px; padding:17px;
-  background:linear-gradient(150deg,var(--surface-2),var(--surface));
-  border:1px solid var(--border);
+  background:linear-gradient(150deg,var(--surface-2),var(--surface)); border:1px solid var(--border);
   box-shadow:0 0 0 2.5px color-mix(in srgb,var(--gold) 45%,transparent), 0 8px 20px -10px var(--shadow);
   display:flex; align-items:center; gap:13px;
 }
 .avatar{
-  width:50px; height:50px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  font-size:1.5rem; flex-shrink:0; border:2px solid var(--surface);
-  box-shadow:0 2px 6px rgba(0,0,0,.14);
+  width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:1.5rem; flex-shrink:0; border:2px solid var(--surface); box-shadow:0 2px 6px rgba(0,0,0,.14);
 }
 .who-block{flex:1; min-width:0;}
 .who-name{
   font-family:'Fredoka',sans-serif; font-weight:600; font-size:.98rem;
-  display:flex; align-items:center; gap:5px;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  display:flex; align-items:center; gap:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
 .mood-line{
   font-family:'Caveat',cursive; font-size:1.3rem; font-weight:600; line-height:1.25; margin-top:1px;
@@ -172,8 +150,8 @@ button:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
 .time-ago{font-size:.7rem; color:var(--ink-soft); margin-top:2px;}
 .reaction-badge{font-size:.68rem; color:var(--rose-deep); margin-top:2px; font-weight:700;}
 .react-btn{
-  background:var(--surface); border:1px solid var(--border);
-  width:38px; height:38px; border-radius:50%; font-size:1.05rem; cursor:pointer; flex-shrink:0; padding:0;
+  background:var(--surface); border:1px solid var(--border); width:38px; height:38px;
+  border-radius:50%; font-size:1.05rem; cursor:pointer; flex-shrink:0; padding:0;
 }
 .react-btn:active{transform:scale(.88);}
 .empty-petit-ami{
@@ -189,27 +167,24 @@ button:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
   display:flex; align-items:center; gap:12px; padding:11px; border-radius:18px;
   background:var(--surface); border:1px solid var(--border); margin-bottom:9px;
 }
-.empty-state{text-align:center; color:var(--ink-soft); padding:30px 16px; font-size:.86rem; line-height:1.6;}
+.empty-state{text-align:center; color:var(--ink-soft); padding:26px 16px; font-size:.86rem; line-height:1.6;}
 
 .fab{
   position:absolute; right:20px; bottom:calc(88px + env(safe-area-inset-bottom));
   width:58px; height:58px; border-radius:50%;
   background:linear-gradient(135deg,var(--rose),var(--rose-deep));
-  color:#fff; border:none; font-size:1.7rem;
-  box-shadow:0 12px 24px -6px var(--shadow);
+  color:#fff; border:none; font-size:1.7rem; box-shadow:0 12px 24px -6px var(--shadow);
   cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:20; padding:0 0 3px;
 }
 .fab:active{transform:scale(.93);}
 .bottom-nav{
-  position:absolute; left:0; right:0; bottom:0; display:flex;
-  background:var(--surface); border-top:1px solid var(--border);
-  padding:9px 20px calc(12px + env(safe-area-inset-bottom)); z-index:15;
+  position:absolute; left:0; right:0; bottom:0; display:flex; background:var(--surface);
+  border-top:1px solid var(--border); padding:9px 20px calc(12px + env(safe-area-inset-bottom)); z-index:15;
 }
 .nav-btn{
   flex:1; background:none; border:none; cursor:pointer;
   display:flex; flex-direction:column; align-items:center; gap:2px;
-  font-family:'Quicksand',sans-serif; font-weight:700; font-size:.68rem;
-  color:var(--ink-soft); padding:4px;
+  font-family:'Quicksand',sans-serif; font-weight:700; font-size:.68rem; color:var(--ink-soft); padding:4px;
 }
 .nav-ic{font-size:1.2rem;}
 .nav-btn.active{color:var(--rose-deep);}
@@ -228,18 +203,33 @@ button:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
 .scrim.open .sheet{transform:translateY(0);}
 .sheet-handle{width:38px; height:4px; border-radius:4px; background:var(--border); margin:0 auto 14px;}
 .sheet h3{font-family:'Fredoka',sans-serif; margin:0 0 6px; font-size:1.12rem;}
-.mood-group-label{
+.mood-group-label,.sheet-group-label{
   font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em;
   color:var(--ink-soft); margin:16px 2px 8px;
 }
 .mood-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px;}
-.mood-opt{
-  border:2px solid var(--border); background:var(--surface-2);
-  border-radius:15px; padding:9px 3px; text-align:center; cursor:pointer;
-}
+.mood-opt{border:2px solid var(--border); background:var(--surface-2); border-radius:15px; padding:9px 3px; text-align:center; cursor:pointer;}
 .mood-opt .em{font-size:1.45rem; display:block; line-height:1.2;}
 .mood-opt .lb{font-size:.58rem; font-weight:700; color:var(--ink-soft); margin-top:3px; display:block; line-height:1.2;}
 .mood-opt.selected{border-color:var(--rose); background:color-mix(in srgb,var(--rose) 16%,var(--surface-2));}
+
+/* Amies */
+.person-row{
+  display:flex; align-items:center; gap:11px; padding:10px 11px; border-radius:15px;
+  border:1px solid var(--border); background:var(--surface-2); margin-bottom:8px;
+}
+.person-row .who-block{min-width:0;}
+.person-name{font-family:'Fredoka',sans-serif; font-weight:600; font-size:.92rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.person-sub{font-size:.7rem; color:var(--ink-soft); margin-top:1px;}
+.mini-btn{
+  border:none; border-radius:11px; padding:8px 13px; cursor:pointer;
+  font-family:'Quicksand',sans-serif; font-weight:700; font-size:.78rem; flex-shrink:0;
+}
+.mini-btn.add{background:linear-gradient(135deg,var(--rose),var(--rose-deep)); color:#fff;}
+.mini-btn.accept{background:var(--ok); color:#fff;}
+.mini-btn.ghost{background:var(--surface); color:var(--ink-soft); border:1px solid var(--border);}
+.mini-btn:disabled{opacity:.55; cursor:default;}
+.btn-pair{display:flex; gap:6px; flex-shrink:0;}
 .friend-pick{
   display:flex; align-items:center; gap:10px; padding:10px; border-radius:14px;
   border:1.5px solid var(--border); margin-bottom:8px; cursor:pointer;
@@ -264,9 +254,8 @@ button:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
 .cal-day .em{font-size:.85rem;}
 .streak-banner{font-family:'Caveat',cursive; font-size:1.3rem; text-align:center; color:var(--rose-deep); margin:10px 0 14px;}
 .journal-note{
-  margin-top:9px; background:var(--surface-2); border-radius:15px;
-  padding:11px 14px; border:1px solid var(--border);
-  display:flex; align-items:center; gap:11px;
+  margin-top:9px; background:var(--surface-2); border-radius:15px; padding:11px 14px;
+  border:1px solid var(--border); display:flex; align-items:center; gap:11px;
 }
 .jdate{font-size:.66rem; color:var(--ink-soft); font-weight:700; text-transform:uppercase; letter-spacing:.05em;}
 .jtext{font-family:'Caveat',cursive; font-size:1.2rem; margin-top:-1px;}
@@ -301,7 +290,6 @@ button:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
     <div class="load-text">On prépare tes humeurs...</div>
   </div>
 
-  <!-- Connexion / inscription -->
   <div class="fullscreen" id="authScreen">
     <div class="ob-brand">MoodLove</div>
     <div class="ob-sub" id="authSub">Content de te revoir 🩷</div>
@@ -314,7 +302,6 @@ button:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
     <button class="link-btn" id="authToggle">Pas encore de compte ? Créer un compte</button>
   </div>
 
-  <!-- Profil (1ère connexion) -->
   <div class="fullscreen" id="onboarding">
     <div class="ob-brand">Bienvenue 💕</div>
     <div class="ob-sub">Comment tes amies vont te reconnaître ?</div>
@@ -329,7 +316,7 @@ button:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
     <div class="brand"><span>🩷</span>MoodLove</div>
     <div class="header-actions">
       <button class="streak-chip" id="streakChip" title="Jours de suite où tout le monde a partagé son humeur">🔥 <span id="streakNum">0</span></button>
-      <button class="icon-btn" id="inviteBtn" title="Inviter une amie">➕</button>
+      <button class="icon-btn" id="friendsBtn" title="Mes amies">👥<span class="badge" id="reqBadge">0</span></button>
       <button class="icon-btn" id="settingsBtn" title="Réglages">⚙️</button>
     </div>
   </div>
@@ -366,12 +353,24 @@ button:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
     </div>
   </div>
 
+  <div class="scrim" id="friendsSheet">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h3>Mes amies</h3>
+      <div id="requestsSection"></div>
+      <div class="sheet-group-label">Chercher une amie par prénom</div>
+      <input type="search" id="searchInput" placeholder="Prénom de ton amie..." autocomplete="off">
+      <div id="searchResults"></div>
+      <div id="myFriendsSection"></div>
+    </div>
+  </div>
+
   <div class="scrim" id="petitAmiSheet">
     <div class="sheet">
       <div class="sheet-handle"></div>
       <h3>Qui est ton petit ami 💕 ?</h3>
       <div id="friendPickList"></div>
-      <div class="hint">Il doit d'abord créer son compte MoodLove pour apparaître ici.</div>
+      <div class="hint">Seules tes amies acceptées apparaissent ici.</div>
     </div>
   </div>
 
@@ -380,7 +379,8 @@ button:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
       <div class="sheet-handle"></div>
       <h3>Réglages</h3>
       <div class="settings-row" id="setPetitAmiRow">💕 <span>Choisir mon petit ami</span></div>
-      <div class="settings-row" id="setInviteRow">➕ <span>Inviter une amie</span></div>
+      <div class="settings-row" id="setFriendsRow">👥 <span>Gérer mes amies</span></div>
+      <div class="settings-row" id="setInviteRow">🔗 <span>Envoyer le lien de l'appli</span></div>
       <div class="settings-row danger" id="logoutRow">👋 <span>Se déconnecter</span></div>
       <div class="hint" id="accountHint"></div>
     </div>
@@ -401,7 +401,8 @@ import {
   signInWithEmailAndPassword, createUserWithEmailAndPassword
 } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js';
 import {
-  getFirestore, doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, onSnapshot
+  getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc,
+  collection, query, where, orderBy, limit, startAt, endAt, onSnapshot
 } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -419,60 +420,67 @@ const db = getFirestore(fb);
 
 const MOOD_GROUPS = [
   { id:'bien', label:'Ça va 💕', moods:[
-    {key:'amoureuse',   emoji:'🥰', label:'Amoureuse',   color:'#FF6FA0'},
-    {key:'craquante',   emoji:'😍', label:'Craquante',   color:'#F65C9A'},
-    {key:'excitee',     emoji:'🤩', label:'Excitée',     color:'#FF8E4A'},
-    {key:'fete',        emoji:'🥳', label:'En fête',     color:'#FFA3C7'},
-    {key:'tropbien',    emoji:'😄', label:'Trop bien',   color:'#F4A65A'},
-    {key:'contente',    emoji:'😊', label:'Contente',    color:'#FFB77A'},
+    {key:'amoureuse',      emoji:'🥰', label:'Amoureuse',      color:'#FF6FA0'},
+    {key:'craquante',      emoji:'😍', label:'Craquante',      color:'#F65C9A'},
+    {key:'excitee',        emoji:'🤩', label:'Excitée',        color:'#FF8E4A'},
+    {key:'fete',           emoji:'🥳', label:'En fête',        color:'#FFA3C7'},
+    {key:'tropbien',       emoji:'😄', label:'Trop bien',      color:'#F4A65A'},
+    {key:'contente',       emoji:'😊', label:'Contente',       color:'#FFB77A'},
     {key:'reconnaissante', emoji:'🫶', label:'Reconnaissante', color:'#E79ACB'},
-    {key:'inspiree',    emoji:'✨', label:'Inspirée',    color:'#D9A3F0'},
-    {key:'motivee',     emoji:'💪', label:'Motivée',     color:'#F58F6E'},
-    {key:'confiante',   emoji:'😎', label:'Confiante',   color:'#C79BEF'},
-    {key:'caline',      emoji:'🤗', label:'Câline',      color:'#FF9EC4'},
-    {key:'zen',         emoji:'😌', label:'Zen',         color:'#B08CF2'},
-    {key:'sereine',     emoji:'😇', label:'Sereine',     color:'#A8C7F0'},
-    {key:'emue',        emoji:'🥹', label:'Émue',        color:'#FFAFD0'}
+    {key:'inspiree',       emoji:'✨', label:'Inspirée',       color:'#D9A3F0'},
+    {key:'motivee',        emoji:'💪', label:'Motivée',        color:'#F58F6E'},
+    {key:'confiante',      emoji:'😎', label:'Confiante',      color:'#C79BEF'},
+    {key:'caline',         emoji:'🤗', label:'Câline',         color:'#FF9EC4'},
+    {key:'zen',            emoji:'😌', label:'Zen',            color:'#B08CF2'},
+    {key:'sereine',        emoji:'😇', label:'Sereine',        color:'#A8C7F0'},
+    {key:'emue',           emoji:'🥹', label:'Émue',           color:'#FFAFD0'}
   ]},
   { id:'bof', label:'Bof 😐', moods:[
-    {key:'fatiguee',    emoji:'😴', label:'Fatiguée',    color:'#8FA6D9'},
-    {key:'crevee',      emoji:'🥱', label:'Crevée',      color:'#7E93C4'},
-    {key:'bof',         emoji:'😐', label:'Bof',         color:'#A9A3B8'},
-    {key:'pensive',     emoji:'🤔', label:'Pensive',     color:'#9BA9D0'},
-    {key:'fondue',      emoji:'🫠', label:'Fondue',      color:'#C0A6CF'},
-    {key:'perdue',      emoji:'😶‍🌫️', label:'Perdue',   color:'#A6ADBD'},
-    {key:'flou',        emoji:'🥴', label:'Dans le flou', color:'#B3A0C7'},
-    {key:'bizarre',     emoji:'🙃', label:'Bizarre',     color:'#C2A8BC'}
+    {key:'fatiguee', emoji:'😴', label:'Fatiguée',     color:'#8FA6D9'},
+    {key:'crevee',   emoji:'🥱', label:'Crevée',       color:'#7E93C4'},
+    {key:'bof',      emoji:'😐', label:'Bof',          color:'#A9A3B8'},
+    {key:'pensive',  emoji:'🤔', label:'Pensive',      color:'#9BA9D0'},
+    {key:'fondue',   emoji:'🫠', label:'Fondue',       color:'#C0A6CF'},
+    {key:'perdue',   emoji:'😶‍🌫️', label:'Perdue',    color:'#A6ADBD'},
+    {key:'flou',     emoji:'🥴', label:'Dans le flou', color:'#B3A0C7'},
+    {key:'bizarre',  emoji:'🙃', label:'Bizarre',      color:'#C2A8BC'}
   ]},
   { id:'pasbien', label:'Ça va pas 🤍', moods:[
-    {key:'stressee',    emoji:'😤', label:'Stressée',    color:'#F17A6B'},
-    {key:'anxieuse',    emoji:'😰', label:'Anxieuse',    color:'#D98B7E'},
-    {key:'enervee',     emoji:'😠', label:'Énervée',     color:'#E06A63'},
-    {key:'agacee',      emoji:'🙄', label:'Agacée',      color:'#C98598'},
-    {key:'triste',      emoji:'😢', label:'Triste',      color:'#A98BAE'},
-    {key:'aubout',      emoji:'😭', label:'Au bout',     color:'#96789E'},
-    {key:'decue',       emoji:'😔', label:'Déçue',       color:'#8E8AAE'},
-    {key:'sensible',    emoji:'🥺', label:'Sensible',    color:'#E6A0BE'},
-    {key:'genee',       emoji:'😳', label:'Gênée',       color:'#DDA0A8'},
-    {key:'malade',      emoji:'🤒', label:'Malade',      color:'#8FBF9B'},
-    {key:'pasenforme',  emoji:'🤕', label:'Pas en forme', color:'#9DBFA5'},
-    {key:'panique',     emoji:'😱', label:'Panique',     color:'#C77B7B'}
+    {key:'stressee',   emoji:'😤', label:'Stressée',     color:'#F17A6B'},
+    {key:'anxieuse',   emoji:'😰', label:'Anxieuse',     color:'#D98B7E'},
+    {key:'enervee',    emoji:'😠', label:'Énervée',      color:'#E06A63'},
+    {key:'agacee',     emoji:'🙄', label:'Agacée',       color:'#C98598'},
+    {key:'triste',     emoji:'😢', label:'Triste',       color:'#A98BAE'},
+    {key:'aubout',     emoji:'😭', label:'Au bout',      color:'#96789E'},
+    {key:'decue',      emoji:'😔', label:'Déçue',        color:'#8E8AAE'},
+    {key:'sensible',   emoji:'🥺', label:'Sensible',     color:'#E6A0BE'},
+    {key:'genee',      emoji:'😳', label:'Gênée',        color:'#DDA0A8'},
+    {key:'malade',     emoji:'🤒', label:'Malade',       color:'#8FBF9B'},
+    {key:'pasenforme', emoji:'🤕', label:'Pas en forme', color:'#9DBFA5'},
+    {key:'panique',    emoji:'😱', label:'Panique',      color:'#C77B7B'}
   ]}
 ];
 const MOODS = MOOD_GROUPS.flatMap(g => g.moods);
 const moodByKey = Object.fromEntries(MOODS.map(m => [m.key, m]));
 const AVATARS = ['🌸','🦋','🍓','⭐️','🌙','🐰','🧸','🌺','🍒','🦄','💐','🐨','🍰','🌷','🐣','☁️','🎀','🍑'];
 const MATCH_WINDOW_MS = 20 * 60 * 1000;
-const HISTORY_DAYS = 45;
+const MAX_TRACKED_DAYS = 60;
 
-let myId = null, myEmail = null;
-let profiles = {}, latestMoods = {}, reactions = {}, recentHistory = [];
+let myId = null, myEmail = null, myProfile = null;
+let friendIds = [];
+let profiles = {};          // uid -> {name, emoji}
+let latestMoods = {};       // uid -> {moodKey, updatedAt}
+let reactions = {};         // uid -> {from, emoji, at}
+let moodDays = {};          // uid -> [dayKey, ...]
+let myJournal = [];         // [{moodKey, at}]
+let requestsIn = [], requestsOut = [];
 let petitAmiId = null, obEmoji = null, celebratedKey = null;
 let isSignupMode = false;
-let unsubs = [];
-let refreshTimer = null;
+let coreUnsubs = [], friendUnsubs = {};
+let refreshTimer = null, searchTimer = null;
 
 const $ = id => document.getElementById(id);
+const pairIdOf = (a, b) => (a < b ? a + '_' + b : b + '_' + a);
 
 function timeAgo(ts){
   if(!ts) return '';
@@ -522,7 +530,7 @@ function setAuthMode(signup){
   isSignupMode = signup;
   $('authSub').textContent = signup ? 'Crée ton compte en 10 secondes' : 'Content de te revoir 🩷';
   $('authSubmit').textContent = signup ? 'Créer mon compte' : 'Se connecter';
-  $('authToggle').textContent = signup ? "Déjà un compte ? Se connecter" : "Pas encore de compte ? Créer un compte";
+  $('authToggle').textContent = signup ? 'Déjà un compte ? Se connecter' : 'Pas encore de compte ? Créer un compte';
   $('authPassword').setAttribute('autocomplete', signup ? 'new-password' : 'current-password');
   $('authError').textContent = '';
 }
@@ -575,9 +583,10 @@ async function saveProfile(){
   const btn = $('obSaveBtn');
   btn.disabled = true;
   btn.textContent = '...';
+  const name = $('obName').value.trim();
   try{
     await setDoc(doc(db, 'profiles', myId), {
-      name: $('obName').value.trim(), emoji: obEmoji, joinedAt: Date.now()
+      name, nameLower: name.toLowerCase(), emoji: obEmoji, joinedAt: Date.now()
     });
     $('onboarding').classList.remove('show');
     startApp();
@@ -588,12 +597,193 @@ async function saveProfile(){
   }
 }
 
-/* ---------- Affichage ---------- */
+/* ---------- Amies : recherche, demandes, acceptation ---------- */
 
-function moodLabel(entry){
+async function searchFriends(){
+  const raw = $('searchInput').value.trim().toLowerCase();
+  const box = $('searchResults');
+  if(raw.length < 2){
+    box.innerHTML = raw.length ? '<div class="hint">Tape au moins 2 lettres.</div>' : '';
+    return;
+  }
+  box.innerHTML = '<div class="hint">Recherche...</div>';
+  try{
+    const snap = await getDocs(query(
+      collection(db, 'profiles'),
+      orderBy('nameLower'), startAt(raw), endAt(raw + ''), limit(12)
+    ));
+    const hits = snap.docs.filter(d => d.id !== myId);
+    if(hits.length === 0){
+      box.innerHTML = '<div class="hint">Personne trouvé avec ce prénom.<br>Vérifie qu\'elle a bien créé son compte.</div>';
+      return;
+    }
+    box.innerHTML = '';
+    hits.forEach(d => {
+      const p = d.data();
+      const uid = d.id;
+      const isFriend = friendIds.includes(uid);
+      const sent = requestsOut.some(r => r.to === uid);
+      const incoming = requestsIn.find(r => r.from === uid);
+
+      const row = document.createElement('div');
+      row.className = 'person-row';
+      let action = '';
+      if(isFriend) action = `<button class="mini-btn ghost" disabled>Déjà amie</button>`;
+      else if(sent) action = `<button class="mini-btn ghost" disabled>Demande envoyée</button>`;
+      else if(incoming) action = `<button class="mini-btn accept" data-accept="${uid}">Accepter</button>`;
+      else action = `<button class="mini-btn add" data-add="${uid}">Ajouter</button>`;
+
+      row.innerHTML = `
+        <div class="avatar" style="width:40px;height:40px;font-size:1.2rem;background:var(--surface)">${p.emoji || '🤍'}</div>
+        <div class="who-block"><div class="person-name">${escapeHtml(p.name || 'Quelqu\'un')}</div></div>
+        ${action}`;
+      const addBtn = row.querySelector('[data-add]');
+      if(addBtn) addBtn.addEventListener('click', () => sendRequest(uid, p));
+      const accBtn = row.querySelector('[data-accept]');
+      if(accBtn) accBtn.addEventListener('click', () => acceptRequest(uid));
+      box.appendChild(row);
+    });
+  }catch(e){
+    box.innerHTML = '<div class="hint">Recherche impossible pour le moment.</div>';
+  }
+}
+
+async function sendRequest(uid, prof){
+  try{
+    await setDoc(doc(db, 'friendRequests', myId + '_' + uid), {
+      from: myId, to: uid, at: Date.now()
+    });
+    showToast('Demande envoyée à ' + (prof && prof.name ? prof.name : 'ton amie') + ' 💌');
+    searchFriends();
+  }catch(e){ showToast('Envoi impossible'); }
+}
+
+async function acceptRequest(fromUid){
+  try{
+    const users = [myId, fromUid].sort();
+    await setDoc(doc(db, 'friendships', pairIdOf(myId, fromUid)), {
+      users, from: fromUid, since: Date.now()
+    });
+    await deleteDoc(doc(db, 'friendRequests', fromUid + '_' + myId));
+    showToast('Vous êtes amies 🩷');
+    searchFriends();
+  }catch(e){ showToast('Impossible d\'accepter'); }
+}
+
+async function declineRequest(fromUid){
+  try{
+    await deleteDoc(doc(db, 'friendRequests', fromUid + '_' + myId));
+    showToast('Demande refusée');
+  }catch(e){ showToast('Action impossible'); }
+}
+
+async function cancelRequest(toUid){
+  try{
+    await deleteDoc(doc(db, 'friendRequests', myId + '_' + toUid));
+    showToast('Demande annulée');
+    searchFriends();
+  }catch(e){ showToast('Action impossible'); }
+}
+
+async function removeFriend(uid){
+  try{
+    await deleteDoc(doc(db, 'friendships', pairIdOf(myId, uid)));
+    if(petitAmiId === uid){
+      petitAmiId = null;
+      await setDoc(doc(db, 'settings', myId), { petitAmiId: null });
+    }
+    showToast('Amie retirée');
+  }catch(e){ showToast('Action impossible'); }
+}
+
+function renderFriendsSheet(){
+  // Demandes reçues
+  const reqBox = $('requestsSection');
+  reqBox.innerHTML = '';
+  if(requestsIn.length > 0){
+    const label = document.createElement('div');
+    label.className = 'sheet-group-label';
+    label.textContent = `Demandes reçues (${requestsIn.length})`;
+    reqBox.appendChild(label);
+    requestsIn.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'person-row';
+      row.innerHTML = `
+        <div class="avatar" style="width:40px;height:40px;font-size:1.2rem;background:var(--surface)">${avatarOf(r.from)}</div>
+        <div class="who-block">
+          <div class="person-name">${escapeHtml(nameOf(r.from))}</div>
+          <div class="person-sub">veut être ton amie</div>
+        </div>
+        <div class="btn-pair">
+          <button class="mini-btn accept">Accepter</button>
+          <button class="mini-btn ghost">Refuser</button>
+        </div>`;
+      const [acc, dec] = row.querySelectorAll('.mini-btn');
+      acc.addEventListener('click', () => acceptRequest(r.from));
+      dec.addEventListener('click', () => declineRequest(r.from));
+      reqBox.appendChild(row);
+    });
+  }
+
+  // Demandes envoyées + mes amies
+  const box = $('myFriendsSection');
+  box.innerHTML = '';
+  if(requestsOut.length > 0){
+    const label = document.createElement('div');
+    label.className = 'sheet-group-label';
+    label.textContent = 'Demandes envoyées';
+    box.appendChild(label);
+    requestsOut.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'person-row';
+      row.innerHTML = `
+        <div class="avatar" style="width:40px;height:40px;font-size:1.2rem;background:var(--surface)">${avatarOf(r.to)}</div>
+        <div class="who-block">
+          <div class="person-name">${escapeHtml(nameOf(r.to))}</div>
+          <div class="person-sub">en attente de réponse</div>
+        </div>
+        <button class="mini-btn ghost">Annuler</button>`;
+      row.querySelector('.mini-btn').addEventListener('click', () => cancelRequest(r.to));
+      box.appendChild(row);
+    });
+  }
+
+  const label2 = document.createElement('div');
+  label2.className = 'sheet-group-label';
+  label2.textContent = `Mes amies (${friendIds.length})`;
+  box.appendChild(label2);
+  if(friendIds.length === 0){
+    const e = document.createElement('div');
+    e.className = 'hint';
+    e.textContent = "Tu n'as pas encore d'amie. Cherche son prénom ci-dessus 🤍";
+    box.appendChild(e);
+  } else {
+    friendIds.forEach(uid => {
+      const row = document.createElement('div');
+      row.className = 'person-row';
+      row.innerHTML = `
+        <div class="avatar" style="width:40px;height:40px;font-size:1.2rem;background:var(--surface)">${avatarOf(uid)}</div>
+        <div class="who-block">
+          <div class="person-name">${escapeHtml(nameOf(uid))}</div>
+          ${uid === petitAmiId ? '<div class="person-sub">👑 ton petit ami</div>' : ''}
+        </div>
+        <button class="mini-btn ghost">Retirer</button>`;
+      row.querySelector('.mini-btn').addEventListener('click', () => removeFriend(uid));
+      box.appendChild(row);
+    });
+  }
+
+  const badge = $('reqBadge');
+  badge.textContent = requestsIn.length;
+  badge.classList.toggle('show', requestsIn.length > 0);
+}
+
+/* ---------- Affichage principal ---------- */
+
+const moodLabel = entry => {
   const m = entry && moodByKey[entry.moodKey];
   return m ? m.label : '';
-}
+};
 
 function renderHome(){
   const mine = latestMoods[myId];
@@ -609,7 +799,7 @@ function renderHome(){
     </div>`;
 
   const slot = $('petitAmiSlot');
-  if(!petitAmiId){
+  if(!petitAmiId || !friendIds.includes(petitAmiId)){
     slot.innerHTML = `<div class="empty-petit-ami" id="setPaBtn"><div class="plus-circle">+</div><div>Épingle ton petit ami ici pour voir son humeur en premier</div></div>`;
     $('setPaBtn').addEventListener('click', openPetitAmiSheet);
   } else {
@@ -631,13 +821,13 @@ function renderHome(){
   }
 
   const list = $('friendsList');
-  const others = Object.keys(profiles)
-    .filter(id => id !== myId && id !== petitAmiId)
+  const others = friendIds
+    .filter(id => id !== petitAmiId)
     .map(id => ({ id, mood: latestMoods[id] }))
     .sort((a, b) => ((b.mood && b.mood.updatedAt) || 0) - ((a.mood && a.mood.updatedAt) || 0));
 
   if(others.length === 0){
-    list.innerHTML = `<div class="empty-state">Tes amies n'ont pas encore rejoint 🤍<br>Appuie sur ➕ en haut pour leur envoyer le lien.</div>`;
+    list.innerHTML = `<div class="empty-state">Tu n'as pas encore ajouté d'amie 🤍<br>Appuie sur 👥 en haut pour chercher leur prénom.</div>`;
     return;
   }
   list.innerHTML = '';
@@ -661,19 +851,11 @@ function renderHome(){
 }
 
 /* ---------- Flamme du groupe ---------- */
-// Jours consécutifs où TOUT LE MONDE (toi + tes amies) a partagé au moins une humeur.
+// Jours consécutifs où TOI ET TOUTES TES AMIES avez partagé au moins une humeur.
 function computeGroupStreak(){
-  const roster = Object.keys(profiles);
-  if(roster.length === 0) return 0;
-  const byDay = {};
-  recentHistory.forEach(h => {
-    const dk = dayKey(h.at);
-    (byDay[dk] = byDay[dk] || new Set()).add(h.uid);
-  });
-  const everyone = dk => {
-    const set = byDay[dk];
-    return !!set && roster.every(id => set.has(id));
-  };
+  const roster = [myId, ...friendIds];
+  if(roster.length < 2) return 0;
+  const everyone = dk => roster.every(uid => (moodDays[uid] || []).includes(dk));
   const cursor = new Date();
   if(!everyone(dayKey(cursor.getTime()))){
     cursor.setDate(cursor.getDate() - 1);
@@ -695,8 +877,7 @@ function renderStreak(){
 /* ---------- Journal ---------- */
 
 function renderJournal(){
-  const myHistory = recentHistory.filter(h => h.uid === myId);
-  const days = new Set(myHistory.map(h => dayKey(h.at)));
+  const days = new Set(myJournal.map(h => dayKey(h.at)));
   let personal = 0;
   const cur = new Date();
   if(!days.has(dayKey(cur.getTime()))) cur.setDate(cur.getDate() - 1);
@@ -710,7 +891,7 @@ function renderJournal(){
   const firstDow = (new Date(year, month, 1).getDay() + 6) % 7;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const byDay = {};
-  myHistory.forEach(h => {
+  myJournal.forEach(h => {
     const d = new Date(h.at);
     if(d.getFullYear() === year && d.getMonth() === month){
       const day = d.getDate();
@@ -738,11 +919,11 @@ function renderJournal(){
 
   const notes = $('journalNotes');
   notes.innerHTML = '';
-  if(myHistory.length === 0){
+  if(myJournal.length === 0){
     notes.innerHTML = `<div class="empty-state">Ton journal se remplira dès ta première humeur 🤍</div>`;
     return;
   }
-  myHistory.slice(0, 12).forEach(h => {
+  myJournal.slice(0, 12).forEach(h => {
     const mood = moodByKey[h.moodKey];
     if(!mood) return;
     const d = new Date(h.at);
@@ -751,14 +932,14 @@ function renderJournal(){
     div.innerHTML = `
       <div class="avatar" style="width:38px;height:38px;font-size:1.15rem;background:${mood.color}">${mood.emoji}</div>
       <div>
-        <div class="jdate">${d.toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'short'})} · ${d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</div>
+        <div class="jdate">${d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})} · ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>
         <div class="jtext">${escapeHtml(mood.label)}</div>
       </div>`;
     notes.appendChild(div);
   });
 }
 
-/* ---------- Mood Match (même humeur, au même moment) ---------- */
+/* ---------- Mood Match ---------- */
 
 function checkMoodMatch(){
   if(!petitAmiId || !myId) return;
@@ -807,7 +988,10 @@ async function saveMood(moodKey){
   closeSheet('moodSheet');
   try{
     await setDoc(doc(db, 'moods', myId), { moodKey, updatedAt: now });
-    await addDoc(collection(db, 'history'), { uid: myId, moodKey, at: now });
+    await addDoc(collection(db, 'profiles', myId, 'journal'), { moodKey, at: now });
+    const days = new Set(moodDays[myId] || []);
+    days.add(dayKey(now));
+    await setDoc(doc(db, 'moodDays', myId), { days: [...days].slice(-MAX_TRACKED_DAYS) });
     showToast(moodByKey[moodKey].emoji + ' humeur partagée');
   }catch(e){ showToast('Impossible de partager, réessaie'); }
 }
@@ -817,13 +1001,12 @@ function closeSheet(id){ $(id).classList.remove('open'); }
 
 function openPetitAmiSheet(){
   closeSheet('settingsSheet');
-  const ids = Object.keys(profiles).filter(id => id !== myId);
   const list = $('friendPickList');
-  if(ids.length === 0){
-    list.innerHTML = `<div class="empty-state">Personne n'a encore rejoint MoodLove.</div>`;
+  if(friendIds.length === 0){
+    list.innerHTML = `<div class="empty-state">Ajoute d'abord ton petit ami dans tes amies 👥</div>`;
   } else {
     list.innerHTML = '';
-    ids.forEach(id => {
+    friendIds.forEach(id => {
       const row = document.createElement('div');
       row.className = 'friend-pick' + (id === petitAmiId ? ' selected' : '');
       row.innerHTML = `<div class="avatar" style="width:36px;height:36px;font-size:1.1rem;background:var(--surface-2)">${avatarOf(id)}</div>
@@ -853,12 +1036,60 @@ async function invite(){
 
 async function logout(){
   closeSheet('settingsSheet');
-  unsubs.forEach(u => { try{ u(); }catch(e){} });
-  unsubs = [];
-  if(refreshTimer){ clearInterval(refreshTimer); refreshTimer = null; }
-  profiles = {}; latestMoods = {}; reactions = {}; recentHistory = [];
-  petitAmiId = null; celebratedKey = null;
+  stopAllListeners();
+  profiles = {}; latestMoods = {}; reactions = {}; moodDays = {};
+  myJournal = []; friendIds = []; requestsIn = []; requestsOut = [];
+  petitAmiId = null; celebratedKey = null; myProfile = null;
   try{ await signOut(auth); }catch(e){}
+}
+
+function stopAllListeners(){
+  coreUnsubs.forEach(u => { try{ u(); }catch(e){} });
+  coreUnsubs = [];
+  Object.values(friendUnsubs).flat().forEach(u => { try{ u(); }catch(e){} });
+  friendUnsubs = {};
+  if(refreshTimer){ clearInterval(refreshTimer); refreshTimer = null; }
+}
+
+/* ---------- Écoute par amie ---------- */
+// Une amie retirée coupe ses écoutes ; une nouvelle amie ouvre les siennes.
+function syncFriendListeners(){
+  const wanted = new Set([myId, ...friendIds]);
+
+  Object.keys(friendUnsubs).forEach(uid => {
+    if(!wanted.has(uid)){
+      friendUnsubs[uid].forEach(u => { try{ u(); }catch(e){} });
+      delete friendUnsubs[uid];
+      delete latestMoods[uid];
+      delete reactions[uid];
+      delete moodDays[uid];
+      delete profiles[uid];
+    }
+  });
+
+  wanted.forEach(uid => {
+    if(friendUnsubs[uid]) return;
+    friendUnsubs[uid] = [
+      onSnapshot(doc(db, 'profiles', uid), s => {
+        if(s.exists()) profiles[uid] = s.data();
+        renderHome();
+        renderFriendsSheet();
+      }, () => {}),
+      onSnapshot(doc(db, 'moods', uid), s => {
+        if(s.exists()) latestMoods[uid] = s.data(); else delete latestMoods[uid];
+        renderHome();
+        checkMoodMatch();
+      }, () => {}),
+      onSnapshot(doc(db, 'reactions', uid), s => {
+        if(s.exists()) reactions[uid] = s.data(); else delete reactions[uid];
+        renderHome();
+      }, () => {}),
+      onSnapshot(doc(db, 'moodDays', uid), s => {
+        moodDays[uid] = (s.exists() && s.data().days) || [];
+        renderStreak();
+      }, () => {})
+    ];
+  });
 }
 
 /* ---------- Construction de l'UI ---------- */
@@ -903,15 +1134,29 @@ function bindUI(){
     renderJournal();
   });
   $('fabBtn').addEventListener('click', () => openSheet('moodSheet'));
-  $('inviteBtn').addEventListener('click', invite);
+  $('friendsBtn').addEventListener('click', () => {
+    renderFriendsSheet();
+    $('searchInput').value = '';
+    $('searchResults').innerHTML = '';
+    openSheet('friendsSheet');
+  });
   $('settingsBtn').addEventListener('click', () => {
     $('accountHint').textContent = myEmail ? 'Connectée avec ' + myEmail : '';
     openSheet('settingsSheet');
   });
   $('setPetitAmiRow').addEventListener('click', openPetitAmiSheet);
+  $('setFriendsRow').addEventListener('click', () => {
+    closeSheet('settingsSheet');
+    renderFriendsSheet();
+    openSheet('friendsSheet');
+  });
   $('setInviteRow').addEventListener('click', invite);
   $('logoutRow').addEventListener('click', logout);
-  ['moodSheet','petitAmiSheet','settingsSheet'].forEach(id => {
+  $('searchInput').addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(searchFriends, 300);
+  });
+  ['moodSheet','friendsSheet','petitAmiSheet','settingsSheet'].forEach(id => {
     $(id).addEventListener('click', e => { if(e.target.id === id) closeSheet(id); });
   });
 }
@@ -921,41 +1166,64 @@ function startApp(){
   $('authScreen').classList.remove('show');
   $('onboarding').classList.remove('show');
 
-  unsubs.push(onSnapshot(collection(db, 'profiles'), snap => {
-    profiles = {};
-    snap.forEach(d => { profiles[d.id] = d.data(); });
-    renderHome();
-    renderStreak();
-  }));
+  coreUnsubs.push(onSnapshot(
+    query(collection(db, 'friendships'), where('users', 'array-contains', myId)),
+    snap => {
+      friendIds = snap.docs.map(d => (d.data().users || []).find(u => u !== myId)).filter(Boolean);
+      syncFriendListeners();
+      renderHome();
+      renderStreak();
+      renderFriendsSheet();
+    }, () => {}
+  ));
 
-  unsubs.push(onSnapshot(collection(db, 'moods'), snap => {
-    latestMoods = {};
-    snap.forEach(d => { latestMoods[d.id] = d.data(); });
-    renderHome();
-    checkMoodMatch();
-  }));
+  coreUnsubs.push(onSnapshot(
+    query(collection(db, 'friendRequests'), where('to', '==', myId)),
+    snap => {
+      requestsIn = snap.docs.map(d => d.data());
+      requestsIn.forEach(r => { if(!profiles[r.from]) loadProfile(r.from); });
+      renderFriendsSheet();
+    }, () => {}
+  ));
 
-  unsubs.push(onSnapshot(collection(db, 'reactions'), snap => {
-    reactions = {};
-    snap.forEach(d => { reactions[d.id] = d.data(); });
-    renderHome();
-  }));
+  coreUnsubs.push(onSnapshot(
+    query(collection(db, 'friendRequests'), where('from', '==', myId)),
+    snap => {
+      requestsOut = snap.docs.map(d => d.data());
+      requestsOut.forEach(r => { if(!profiles[r.to]) loadProfile(r.to); });
+      renderFriendsSheet();
+    }, () => {}
+  ));
 
-  const cutoff = Date.now() - HISTORY_DAYS * 24 * 60 * 60 * 1000;
-  unsubs.push(onSnapshot(query(collection(db, 'history'), where('at', '>=', cutoff), orderBy('at', 'desc')), snap => {
-    recentHistory = snap.docs.map(d => d.data());
-    renderStreak();
-    if($('journalView').style.display !== 'none') renderJournal();
-  }));
+  coreUnsubs.push(onSnapshot(
+    query(collection(db, 'profiles', myId, 'journal'), orderBy('at', 'desc'), limit(60)),
+    snap => {
+      myJournal = snap.docs.map(d => d.data());
+      if($('journalView').style.display !== 'none') renderJournal();
+    }, () => {}
+  ));
 
-  unsubs.push(onSnapshot(doc(db, 'settings', myId), snap => {
+  coreUnsubs.push(onSnapshot(doc(db, 'settings', myId), snap => {
     const data = snap.data();
     petitAmiId = (data && data.petitAmiId) || null;
     renderHome();
     checkMoodMatch();
-  }));
+  }, () => {}));
 
+  syncFriendListeners();
+  renderHome();
   refreshTimer = setInterval(renderHome, 60000);
+}
+
+async function loadProfile(uid){
+  try{
+    const s = await getDoc(doc(db, 'profiles', uid));
+    if(s.exists()){
+      profiles[uid] = s.data();
+      renderFriendsSheet();
+      renderHome();
+    }
+  }catch(e){}
 }
 
 buildMoodPicker();
@@ -979,6 +1247,11 @@ onAuthStateChanged(auth, async user => {
   try{
     const prof = await getDoc(doc(db, 'profiles', myId));
     if(prof.exists()){
+      myProfile = prof.data();
+      // Profils créés avant la recherche : on ajoute la clé de recherche.
+      if(!myProfile.nameLower && myProfile.name){
+        try{ await updateDoc(doc(db, 'profiles', myId), { nameLower: myProfile.name.toLowerCase() }); }catch(e){}
+      }
       startApp();
     } else {
       $('loadingScreen').classList.add('hidden');
