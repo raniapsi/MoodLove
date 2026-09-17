@@ -368,9 +368,9 @@ button:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
   <div class="scrim" id="petitAmiSheet">
     <div class="sheet">
       <div class="sheet-handle"></div>
-      <h3>Qui est ton petit ami 💕 ?</h3>
+      <h3>Mon petit ami 💕</h3>
       <div id="friendPickList"></div>
-      <div class="hint">Seules tes amies acceptées apparaissent ici.</div>
+      <div class="hint" id="petitAmiHint"></div>
     </div>
   </div>
 
@@ -476,6 +476,9 @@ let reactions = {};         // uid -> {from, emoji, at}
 let moodDays = {};          // uid -> [dayKey, ...]
 let myJournal = [];         // [{moodKey, at}]
 let requestsIn = [], requestsOut = [];
+let coupleReqIn = [], coupleReqOut = [];
+let seenCoupleReqIds = null;   // null tant que le premier instantané n'est pas arrivé
+let coupleSeen = false;
 let petitAmiId = null, obEmoji = null, celebratedKey = null;
 let isSignupMode = false;
 let coreUnsubs = [], friendUnsubs = {};
@@ -754,11 +757,10 @@ async function cancelRequest(toUid){
 
 async function removeFriend(uid){
   try{
+    // Retirer quelqu'un de ses amies met aussi fin au couple : l'accès aux
+    // humeurs passe par l'amitié.
+    if(petitAmiId === uid) await deleteDoc(doc(db, 'couples', pairIdOf(myId, uid)));
     await deleteDoc(doc(db, 'friendships', pairIdOf(myId, uid)));
-    if(petitAmiId === uid){
-      petitAmiId = null;
-      await setDoc(doc(db, 'settings', myId), { petitAmiId: null });
-    }
     showToast('Amie retirée');
   }catch(e){ showToast('Action impossible'); }
 }
@@ -840,9 +842,14 @@ function renderFriendsSheet(){
     });
   }
 
+  renderBadge();
+}
+
+function renderBadge(){
+  const n = requestsIn.length + coupleReqIn.length;
   const badge = $('reqBadge');
-  badge.textContent = requestsIn.length;
-  badge.classList.toggle('show', requestsIn.length > 0);
+  badge.textContent = n;
+  badge.classList.toggle('show', n > 0);
 }
 
 /* ---------- Affichage principal ---------- */
@@ -870,7 +877,12 @@ function renderHome(){
 
   const slot = $('petitAmiSlot');
   if(!petitAmiId || !friendIds.includes(petitAmiId)){
-    slot.innerHTML = `<div class="empty-petit-ami" id="setPaBtn"><div class="plus-circle">+</div><div>Épingle ton petit ami ici pour voir son humeur en premier</div></div>`;
+    const pending = coupleReqIn.length > 0
+      ? coupleReqIn.length + ' demande' + (coupleReqIn.length > 1 ? 's' : '') + ' de couple en attente 💕'
+      : coupleReqOut.length > 0
+        ? 'Demande envoyée — en attente de sa réponse'
+        : 'Demande à ton petit ami d\'être en couple';
+    slot.innerHTML = `<div class="empty-petit-ami" id="setPaBtn"><div class="plus-circle">+</div><div>${pending}</div></div>`;
     $('setPaBtn').addEventListener('click', openPetitAmiSheet);
   } else {
     const entry = latestMoods[petitAmiId];
@@ -1084,27 +1096,149 @@ function renderSettings(){
 function openSheet(id){ $(id).classList.add('open'); }
 function closeSheet(id){ $(id).classList.remove('open'); }
 
-function openPetitAmiSheet(){
-  closeSheet('settingsSheet');
+/* ---------- Couple : demande et acceptation ---------- */
+
+async function sendCoupleRequest(uid){
+  if(petitAmiId){ showToast('Tu as déjà un petit ami'); return; }
+  try{
+    await setDoc(doc(db, 'coupleRequests', myId + '_' + uid), { from: myId, to: uid, at: Date.now() });
+    showToast('Demande envoyée à ' + nameOf(uid) + ' 💕');
+    renderPetitAmiSheet();
+  }catch(e){ showToast('Envoi impossible'); }
+}
+
+async function acceptCoupleRequest(fromUid){
+  if(petitAmiId){ showToast('Retire d\'abord ton petit ami actuel'); return; }
+  try{
+    const users = [myId, fromUid].sort();
+    await setDoc(doc(db, 'couples', pairIdOf(myId, fromUid)), { users, from: fromUid, since: Date.now() });
+    await deleteDoc(doc(db, 'coupleRequests', fromUid + '_' + myId));
+    showToast('Vous êtes en couple 💕');
+  }catch(e){ showToast('Impossible d\'accepter'); }
+}
+
+async function declineCoupleRequest(fromUid){
+  try{
+    await deleteDoc(doc(db, 'coupleRequests', fromUid + '_' + myId));
+    showToast('Demande refusée');
+  }catch(e){ showToast('Action impossible'); }
+}
+
+async function cancelCoupleRequest(toUid){
+  try{
+    await deleteDoc(doc(db, 'coupleRequests', myId + '_' + toUid));
+    showToast('Demande annulée');
+    renderPetitAmiSheet();
+  }catch(e){ showToast('Action impossible'); }
+}
+
+async function breakUp(){
+  if(!petitAmiId) return;
+  try{
+    await deleteDoc(doc(db, 'couples', pairIdOf(myId, petitAmiId)));
+    showToast('Ce n\'est plus ton petit ami');
+  }catch(e){ showToast('Action impossible'); }
+}
+
+function renderPetitAmiSheet(){
   const list = $('friendPickList');
-  if(friendIds.length === 0){
-    list.innerHTML = `<div class="empty-state">Ajoute d'abord ton petit ami dans tes amies 👥</div>`;
-  } else {
-    list.innerHTML = '';
-    friendIds.forEach(id => {
+  list.innerHTML = '';
+
+  // Déjà en couple
+  if(petitAmiId){
+    const row = document.createElement('div');
+    row.className = 'person-row';
+    row.innerHTML = `
+      <div class="avatar" style="width:40px;height:40px;font-size:1.2rem;background:var(--surface)">${avatarOf(petitAmiId)}</div>
+      <div class="who-block">
+        <div class="person-name">👑 ${escapeHtml(nameOf(petitAmiId))}</div>
+        <div class="person-sub">ton petit ami</div>
+      </div>
+      <button class="mini-btn ghost">Retirer</button>`;
+    row.querySelector('.mini-btn').addEventListener('click', breakUp);
+    list.appendChild(row);
+    $('petitAmiHint').textContent = 'Vous êtes tous les deux d\'accord — il te voit aussi en petit ami de son côté.';
+    return;
+  }
+
+  // Demandes reçues
+  if(coupleReqIn.length > 0){
+    const label = document.createElement('div');
+    label.className = 'sheet-group-label';
+    label.textContent = 'Demandes reçues';
+    list.appendChild(label);
+    coupleReqIn.forEach(r => {
       const row = document.createElement('div');
-      row.className = 'friend-pick' + (id === petitAmiId ? ' selected' : '');
-      row.innerHTML = `<div class="avatar" style="width:36px;height:36px;font-size:1.1rem;background:var(--surface-2)">${avatarOf(id)}</div>
-                       <div>${escapeHtml(nameOf(id))}</div>`;
-      row.addEventListener('click', async () => {
-        petitAmiId = id;
-        closeSheet('petitAmiSheet');
-        renderHome();
-        try{ await setDoc(doc(db, 'settings', myId), { petitAmiId: id }); }catch(e){}
-      });
+      row.className = 'person-row';
+      row.innerHTML = `
+        <div class="avatar" style="width:40px;height:40px;font-size:1.2rem;background:var(--surface)">${avatarOf(r.from)}</div>
+        <div class="who-block">
+          <div class="person-name">${escapeHtml(nameOf(r.from))}</div>
+          <div class="person-sub">veut être ton petit ami 💕</div>
+        </div>
+        <div class="btn-pair">
+          <button class="mini-btn accept">Accepter</button>
+          <button class="mini-btn ghost">Refuser</button>
+        </div>`;
+      const [acc, dec] = row.querySelectorAll('.mini-btn');
+      acc.addEventListener('click', () => acceptCoupleRequest(r.from));
+      dec.addEventListener('click', () => declineCoupleRequest(r.from));
       list.appendChild(row);
     });
   }
+
+  // Demandes envoyées
+  if(coupleReqOut.length > 0){
+    const label = document.createElement('div');
+    label.className = 'sheet-group-label';
+    label.textContent = 'Demande envoyée';
+    list.appendChild(label);
+    coupleReqOut.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'person-row';
+      row.innerHTML = `
+        <div class="avatar" style="width:40px;height:40px;font-size:1.2rem;background:var(--surface)">${avatarOf(r.to)}</div>
+        <div class="who-block">
+          <div class="person-name">${escapeHtml(nameOf(r.to))}</div>
+          <div class="person-sub">en attente de sa réponse</div>
+        </div>
+        <button class="mini-btn ghost">Annuler</button>`;
+      row.querySelector('.mini-btn').addEventListener('click', () => cancelCoupleRequest(r.to));
+      list.appendChild(row);
+    });
+  }
+
+  // Amies à qui demander
+  const askable = friendIds.filter(id => !coupleReqOut.some(r => r.to === id) && !coupleReqIn.some(r => r.from === id));
+  const label = document.createElement('div');
+  label.className = 'sheet-group-label';
+  label.textContent = 'Demander à';
+  list.appendChild(label);
+  if(askable.length === 0){
+    const e = document.createElement('div');
+    e.className = 'hint';
+    e.textContent = friendIds.length === 0
+      ? "Ajoute-le d'abord dans tes amies 👥"
+      : "Aucune autre personne à qui demander.";
+    list.appendChild(e);
+  } else {
+    askable.forEach(id => {
+      const row = document.createElement('div');
+      row.className = 'person-row';
+      row.innerHTML = `
+        <div class="avatar" style="width:40px;height:40px;font-size:1.2rem;background:var(--surface)">${avatarOf(id)}</div>
+        <div class="who-block"><div class="person-name">${escapeHtml(nameOf(id))}</div></div>
+        <button class="mini-btn add">Demander 💕</button>`;
+      row.querySelector('.mini-btn').addEventListener('click', () => sendCoupleRequest(id));
+      list.appendChild(row);
+    });
+  }
+  $('petitAmiHint').textContent = "Il devra accepter de son côté pour que vous soyez officiellement en couple.";
+}
+
+function openPetitAmiSheet(){
+  closeSheet('settingsSheet');
+  renderPetitAmiSheet();
   openSheet('petitAmiSheet');
 }
 
@@ -1124,6 +1258,7 @@ async function logout(){
   stopAllListeners();
   profiles = {}; latestMoods = {}; reactions = {}; moodDays = {};
   myJournal = []; friendIds = []; requestsIn = []; requestsOut = [];
+  coupleReqIn = []; coupleReqOut = []; seenCoupleReqIds = null; coupleSeen = false;
   petitAmiId = null; celebratedKey = null; myProfile = null;
   knownMoods = {}; lastReactionAt = 0; myReactionSeen = false;
   try{ await signOut(auth); }catch(e){}
@@ -1142,6 +1277,7 @@ function stopAllListeners(){
 // Une amie retirée coupe ses écoutes ; une nouvelle amie ouvre les siennes.
 function syncFriendListeners(){
   const wanted = new Set([myId, ...friendIds]);
+  if(petitAmiId) wanted.add(petitAmiId);
 
   Object.keys(friendUnsubs).forEach(uid => {
     if(!wanted.has(uid)){
@@ -1307,12 +1443,52 @@ function startApp(){
     }, () => {}
   ));
 
-  coreUnsubs.push(onSnapshot(doc(db, 'settings', myId), snap => {
-    const data = snap.data();
-    petitAmiId = (data && data.petitAmiId) || null;
-    renderHome();
-    checkMoodMatch();
-  }, () => {}));
+  coreUnsubs.push(onSnapshot(
+    query(collection(db, 'couples'), where('users', 'array-contains', myId)),
+    snap => {
+      const prev = petitAmiId;
+      const first = snap.docs[0];
+      petitAmiId = first ? ((first.data().users || []).find(u => u !== myId) || null) : null;
+      // Il vient d'accepter ma demande.
+      if(coupleSeen && petitAmiId && !prev){
+        notify('💕 C\'est officiel', escapeHtml(nameOf(petitAmiId)) + ' est ton petit ami');
+      }
+      coupleSeen = true;
+      if(petitAmiId) loadProfile(petitAmiId);
+      syncFriendListeners();
+      renderHome();
+      renderPetitAmiSheet();
+      checkMoodMatch();
+    }, () => {}
+  ));
+
+  coreUnsubs.push(onSnapshot(
+    query(collection(db, 'coupleRequests'), where('to', '==', myId)),
+    snap => {
+      coupleReqIn = snap.docs.map(d => d.data());
+      coupleReqIn.forEach(r => { if(!profiles[r.from]) loadProfile(r.from); });
+      const ids = new Set(snap.docs.map(d => d.id));
+      if(seenCoupleReqIds){
+        snap.docs.forEach(d => {
+          if(!seenCoupleReqIds.has(d.id)){
+            notify('💕 Demande de couple', nameOf(d.data().from) + ' veut être ton petit ami');
+          }
+        });
+      }
+      seenCoupleReqIds = ids;
+      renderPetitAmiSheet();
+      renderBadge();
+    }, () => {}
+  ));
+
+  coreUnsubs.push(onSnapshot(
+    query(collection(db, 'coupleRequests'), where('from', '==', myId)),
+    snap => {
+      coupleReqOut = snap.docs.map(d => d.data());
+      coupleReqOut.forEach(r => { if(!profiles[r.to]) loadProfile(r.to); });
+      renderPetitAmiSheet();
+    }, () => {}
+  ));
 
   syncFriendListeners();
   renderHome();
