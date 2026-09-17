@@ -1,4 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <title>MoodLove</title>
+<meta name="description" content="Partagez votre humeur du moment avec votre petit ami et vos amies.">
+<meta name="theme-color" content="#FFE9F0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MoodLove">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@400;500;600;700&family=Caveat:wght@500;600;700&display=swap">
 <style>
 :root{
@@ -14,6 +29,7 @@
   --border:rgba(74,46,69,0.1);
   --shadow:rgba(232,74,136,0.22);
   --sheet-scrim:rgba(74,46,69,0.35);
+  --danger:#D45A6B;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -29,496 +45,794 @@
     --border:rgba(255,255,255,0.1);
     --shadow:rgba(0,0,0,0.45);
     --sheet-scrim:rgba(10,4,9,0.55);
+    --danger:#FF9AA6;
   }
 }
-:root[data-theme="dark"]{
-  --bg-a:#231320;
-  --bg-b:#2A1D3B;
-  --surface:#32202F;
-  --surface-2:#3B2536;
-  --ink:#FBEAF2;
-  --ink-soft:#D3AFC9;
-  --rose:#FF8FB8;
-  --rose-deep:#FFA9CC;
-  --gold:#F0C179;
-  --border:rgba(255,255,255,0.1);
-  --shadow:rgba(0,0,0,0.45);
-  --sheet-scrim:rgba(10,4,9,0.55);
-}
-*{box-sizing:border-box;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
 body{
   margin:0;
   background:radial-gradient(circle at 30% 0%, var(--bg-b), var(--bg-a) 60%);
   color:var(--ink);
-  font-family:'Quicksand',sans-serif;
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:28px 14px;
-}
-.stage{
-  width:100%;
-  max-width:400px;
+  font-family:'Quicksand',system-ui,sans-serif;
+  display:flex; align-items:center; justify-content:center;
+  overscroll-behavior:none;
 }
 .phone{
-  position:relative;
-  background:var(--surface);
-  border-radius:38px;
-  box-shadow:0 30px 60px -20px var(--shadow), 0 0 0 8px rgba(255,255,255,0.35) inset;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  height:min(780px, 86vh);
+  position:relative; width:100%; max-width:440px; height:100dvh;
+  background:var(--surface); overflow:hidden; display:flex; flex-direction:column;
 }
-@media (max-width:460px){
-  body{padding:0;}
-  .stage{max-width:100%;}
-  .phone{height:100vh; border-radius:0; box-shadow:none;}
+@media (min-width:520px) and (min-height:760px){
+  body{padding:24px;}
+  .phone{height:min(820px,92vh); border-radius:36px; box-shadow:0 30px 60px -20px var(--shadow);}
 }
-.notch{
-  position:absolute;
-  top:10px; left:50%; transform:translateX(-50%);
-  width:90px; height:22px; border-radius:20px;
-  background:var(--ink); opacity:.12; z-index:5;
+
+/* ---------- Écrans pleins ---------- */
+.fullscreen{
+  position:absolute; inset:0; z-index:80; background:var(--surface);
+  display:none; flex-direction:column; justify-content:center;
+  padding:28px 24px calc(28px + env(safe-area-inset-bottom)); overflow-y:auto;
 }
-.app-header{
-  padding:34px 22px 14px;
-  display:flex; align-items:center; justify-content:space-between;
-  flex-shrink:0;
+.fullscreen.show{display:flex;}
+.ob-brand{font-family:'Fredoka',sans-serif; font-size:2.1rem; color:var(--rose-deep); text-align:center; margin-bottom:2px;}
+.ob-sub{font-family:'Caveat',cursive; font-size:1.3rem; color:var(--ink-soft); text-align:center; margin-bottom:24px;}
+.field-label{font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:var(--ink-soft); margin:0 0 6px 3px;}
+input[type="text"],input[type="email"],input[type="password"]{
+  width:100%; border:1.5px solid var(--border); border-radius:13px;
+  padding:12px 13px; font-family:'Quicksand',sans-serif; font-size:.95rem;
+  background:var(--surface-2); color:var(--ink); margin-bottom:14px;
 }
-.brand{
-  display:flex; align-items:center; gap:8px;
-  font-family:'Fredoka',sans-serif; font-weight:600; font-size:1.35rem;
-  color:var(--rose-deep);
+input:focus{outline:none; border-color:var(--rose);}
+.primary-btn{
+  width:100%; border:none; border-radius:15px;
+  background:linear-gradient(135deg,var(--rose),var(--rose-deep));
+  color:#fff; font-family:'Fredoka',sans-serif; font-weight:600; font-size:1rem;
+  padding:14px; cursor:pointer; margin-top:4px;
 }
-.brand .dot{font-size:1.1rem;}
-.header-actions{display:flex; align-items:center; gap:8px;}
-.streak-chip, .icon-btn{
-  display:flex; align-items:center; gap:4px;
-  background:var(--surface-2);
-  border:1px solid var(--border);
-  color:var(--ink);
+.primary-btn:disabled{opacity:.45;}
+.link-btn{
+  background:none; border:none; color:var(--rose-deep); cursor:pointer;
   font-family:'Quicksand',sans-serif; font-weight:700; font-size:.85rem;
-  padding:6px 10px; border-radius:999px;
-  cursor:pointer;
+  padding:14px 4px 0; width:100%; text-align:center;
 }
-.icon-btn{padding:7px 9px; font-size:1rem;}
-.icon-btn:focus-visible, .streak-chip:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
+.auth-error{
+  color:var(--danger); font-size:.82rem; font-weight:600; text-align:center;
+  margin:10px 0 0; min-height:1em; line-height:1.4;
+}
+.emoji-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-bottom:8px;}
+.emoji-opt{
+  aspect-ratio:1; border-radius:13px; border:2px solid var(--border);
+  background:var(--surface-2); font-size:1.35rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; padding:0;
+}
+.emoji-opt.selected{border-color:var(--rose); background:color-mix(in srgb,var(--rose) 14%,var(--surface-2));}
 
-.tabs-view{flex:1; overflow-y:auto; padding:4px 20px 110px;}
-.tabs-view::-webkit-scrollbar{width:0;}
+#loadingScreen{
+  position:absolute; inset:0; z-index:90; background:var(--surface);
+  display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px;
+}
+#loadingScreen.hidden{display:none;}
+.load-heart{font-size:2.4rem; animation:pulse 1.3s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1); opacity:.7;} 50%{transform:scale(1.18); opacity:1;}}
+.load-text{font-family:'Caveat',cursive; font-size:1.2rem; color:var(--ink-soft);}
 
+/* ---------- App ---------- */
+.app-header{
+  padding:calc(14px + env(safe-area-inset-top)) 18px 12px;
+  display:flex; align-items:center; justify-content:space-between; flex-shrink:0;
+}
+.brand{display:flex; align-items:center; gap:7px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:1.3rem; color:var(--rose-deep);}
+.header-actions{display:flex; align-items:center; gap:6px;}
+.streak-chip,.icon-btn{
+  display:flex; align-items:center; gap:4px;
+  background:var(--surface-2); border:1px solid var(--border); color:var(--ink);
+  font-family:'Quicksand',sans-serif; font-weight:700; font-size:.85rem;
+  padding:7px 10px; border-radius:999px; cursor:pointer;
+}
+.icon-btn{padding:7px 9px; font-size:.95rem;}
+.streak-chip.hot{border-color:var(--gold); background:color-mix(in srgb,var(--gold) 20%,var(--surface-2));}
+button:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
+
+.view{flex:1; overflow-y:auto; padding:2px 18px 120px; -webkit-overflow-scrolling:touch;}
+.view::-webkit-scrollbar{width:0;}
 .section-label{
-  font-family:'Quicksand',sans-serif; font-weight:700; font-size:.72rem;
-  text-transform:uppercase; letter-spacing:.09em; color:var(--ink-soft);
-  margin:18px 4px 10px;
+  font-family:'Quicksand',sans-serif; font-weight:700; font-size:.7rem;
+  text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); margin:20px 4px 10px;
 }
-.section-label:first-child{margin-top:2px;}
+.section-label:first-child{margin-top:4px;}
 
-.petit-ami-card{
-  position:relative;
-  border-radius:26px;
-  padding:18px;
-  background:linear-gradient(150deg, var(--surface-2), var(--surface));
-  border:1px solid var(--border);
-  box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 35%, transparent);
-  display:flex; align-items:center; gap:14px;
-  cursor:pointer;
+.my-card{
+  border-radius:22px; padding:15px;
+  background:linear-gradient(140deg,var(--surface-2),var(--surface));
+  border:1px solid var(--border); display:flex; align-items:center; gap:13px;
 }
-.petit-ami-card .halo{
-  position:absolute; inset:-2px;
-  border-radius:28px;
-  background:conic-gradient(from 0deg, var(--gold), var(--rose), var(--gold));
-  z-index:-1;
-  opacity:.55;
-  filter:blur(6px);
+.petit-ami-card{
+  position:relative; border-radius:24px; padding:17px;
+  background:linear-gradient(150deg,var(--surface-2),var(--surface));
+  border:1px solid var(--border);
+  box-shadow:0 0 0 2.5px color-mix(in srgb,var(--gold) 45%,transparent), 0 8px 20px -10px var(--shadow);
+  display:flex; align-items:center; gap:13px;
 }
 .avatar{
-  width:52px; height:52px; border-radius:50%;
+  width:50px; height:50px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
-  font-family:'Fredoka',sans-serif; font-weight:600; font-size:1.4rem;
-  flex-shrink:0; border:2px solid var(--surface);
-  box-shadow:0 2px 6px rgba(0,0,0,.15);
+  font-size:1.5rem; flex-shrink:0; border:2px solid var(--surface);
+  box-shadow:0 2px 6px rgba(0,0,0,.14);
 }
 .who-block{flex:1; min-width:0;}
-.who-name{font-family:'Fredoka',sans-serif; font-weight:600; font-size:1rem; display:flex; align-items:center; gap:6px;}
-.who-name .crown{font-size:.85rem;}
-.mood-line{
-  font-family:'Caveat',cursive; font-size:1.25rem; font-weight:600;
-  color:var(--ink); margin-top:2px;
+.who-name{
+  font-family:'Fredoka',sans-serif; font-weight:600; font-size:.98rem;
+  display:flex; align-items:center; gap:5px;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-.time-ago{font-size:.72rem; color:var(--ink-soft); margin-top:2px;}
+.mood-line{
+  font-family:'Caveat',cursive; font-size:1.3rem; font-weight:600; line-height:1.25; margin-top:1px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.time-ago{font-size:.7rem; color:var(--ink-soft); margin-top:2px;}
+.reaction-badge{font-size:.68rem; color:var(--rose-deep); margin-top:2px; font-weight:700;}
 .react-btn{
-  border:none; background:var(--surface); border:1px solid var(--border);
-  width:38px; height:38px; border-radius:50%; font-size:1.1rem; cursor:pointer;
-  flex-shrink:0;
-}
-.react-btn:active{transform:scale(.9);}
-
-.empty-petit-ami{
-  border:1.5px dashed var(--rose);
-  border-radius:22px; padding:16px;
-  display:flex; align-items:center; gap:12px;
-  color:var(--rose-deep); font-weight:600; cursor:pointer;
-  background:var(--surface-2);
-}
-.empty-petit-ami .plus-circle{
-  width:38px; height:38px; border-radius:50%; background:var(--rose);
-  color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0;
-}
-
-.friend-row{
-  display:flex; align-items:center; gap:12px;
-  padding:12px; border-radius:20px;
   background:var(--surface); border:1px solid var(--border);
-  margin-bottom:10px;
+  width:38px; height:38px; border-radius:50%; font-size:1.05rem; cursor:pointer; flex-shrink:0; padding:0;
 }
-.friend-row .mood-line{font-size:1.1rem;}
-.reaction-badge{
-  font-size:.68rem; color:var(--rose-deep); margin-top:2px;
+.react-btn:active{transform:scale(.88);}
+.empty-petit-ami{
+  border:1.5px dashed var(--rose); border-radius:20px; padding:15px;
+  display:flex; align-items:center; gap:12px; color:var(--rose-deep);
+  font-weight:600; cursor:pointer; background:var(--surface-2); font-size:.9rem;
 }
+.plus-circle{
+  width:36px; height:36px; border-radius:50%; background:var(--rose); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-size:1.25rem; flex-shrink:0;
+}
+.friend-row{
+  display:flex; align-items:center; gap:12px; padding:11px; border-radius:18px;
+  background:var(--surface); border:1px solid var(--border); margin-bottom:9px;
+}
+.empty-state{text-align:center; color:var(--ink-soft); padding:30px 16px; font-size:.86rem; line-height:1.6;}
 
 .fab{
-  position:absolute; right:20px; bottom:96px;
+  position:absolute; right:20px; bottom:calc(88px + env(safe-area-inset-bottom));
   width:58px; height:58px; border-radius:50%;
-  background:linear-gradient(135deg, var(--rose), var(--rose-deep));
-  color:#fff; border:none; font-size:1.7rem; font-weight:600;
+  background:linear-gradient(135deg,var(--rose),var(--rose-deep));
+  color:#fff; border:none; font-size:1.7rem;
   box-shadow:0 12px 24px -6px var(--shadow);
-  cursor:pointer; display:flex; align-items:center; justify-content:center;
-  z-index:20;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:20; padding:0 0 3px;
 }
-.fab:active{transform:scale(.94);}
-
+.fab:active{transform:scale(.93);}
 .bottom-nav{
-  position:absolute; left:0; right:0; bottom:0;
-  display:flex; background:var(--surface);
-  border-top:1px solid var(--border);
-  padding:10px 20px calc(14px + env(safe-area-inset-bottom));
-  z-index:15;
+  position:absolute; left:0; right:0; bottom:0; display:flex;
+  background:var(--surface); border-top:1px solid var(--border);
+  padding:9px 20px calc(12px + env(safe-area-inset-bottom)); z-index:15;
 }
 .nav-btn{
   flex:1; background:none; border:none; cursor:pointer;
-  display:flex; flex-direction:column; align-items:center; gap:3px;
-  font-family:'Quicksand',sans-serif; font-weight:700; font-size:.7rem;
-  color:var(--ink-soft);
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  font-family:'Quicksand',sans-serif; font-weight:700; font-size:.68rem;
+  color:var(--ink-soft); padding:4px;
 }
-.nav-btn .nav-ic{font-size:1.25rem;}
+.nav-ic{font-size:1.2rem;}
 .nav-btn.active{color:var(--rose-deep);}
 
-.sheet-scrim{
-  position:absolute; inset:0; background:var(--sheet-scrim);
-  z-index:30; display:flex; align-items:flex-end;
-  opacity:0; pointer-events:none; transition:opacity .2s ease;
+.scrim{
+  position:absolute; inset:0; background:var(--sheet-scrim); z-index:30;
+  display:flex; align-items:flex-end; opacity:0; pointer-events:none; transition:opacity .2s ease;
 }
-.sheet-scrim.open{opacity:1; pointer-events:auto;}
+.scrim.open{opacity:1; pointer-events:auto;}
 .sheet{
-  background:var(--surface); width:100%;
-  border-radius:26px 26px 0 0;
-  padding:20px 20px calc(22px + env(safe-area-inset-bottom));
+  background:var(--surface); width:100%; border-radius:24px 24px 0 0;
+  padding:18px 18px calc(20px + env(safe-area-inset-bottom));
   transform:translateY(100%); transition:transform .28s cubic-bezier(.2,.9,.3,1);
   max-height:88%; overflow-y:auto;
 }
-.sheet-scrim.open .sheet{transform:translateY(0);}
-.sheet-handle{width:40px; height:4px; border-radius:4px; background:var(--border); margin:0 auto 14px;}
-.sheet h3{font-family:'Fredoka',sans-serif; margin:0 0 14px; font-size:1.15rem;}
-.mood-grid{
-  display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px;
+.scrim.open .sheet{transform:translateY(0);}
+.sheet-handle{width:38px; height:4px; border-radius:4px; background:var(--border); margin:0 auto 14px;}
+.sheet h3{font-family:'Fredoka',sans-serif; margin:0 0 6px; font-size:1.12rem;}
+.mood-group-label{
+  font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em;
+  color:var(--ink-soft); margin:16px 2px 8px;
 }
+.mood-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px;}
 .mood-opt{
   border:2px solid var(--border); background:var(--surface-2);
-  border-radius:16px; padding:10px 4px; text-align:center; cursor:pointer;
+  border-radius:15px; padding:9px 3px; text-align:center; cursor:pointer;
 }
-.mood-opt .em{font-size:1.5rem; display:block;}
-.mood-opt .lb{font-size:.65rem; font-weight:700; color:var(--ink-soft); margin-top:3px; display:block;}
-.mood-opt.selected{border-color:var(--rose); background:color-mix(in srgb, var(--rose) 14%, var(--surface-2));}
-.sheet textarea{
-  width:100%; border:1.5px solid var(--border); border-radius:14px;
-  padding:10px 12px; font-family:'Quicksand',sans-serif; font-size:.9rem;
-  resize:none; background:var(--surface-2); color:var(--ink); min-height:60px;
-}
-.save-btn{
-  width:100%; margin-top:14px; border:none; border-radius:16px;
-  background:linear-gradient(135deg, var(--rose), var(--rose-deep));
-  color:#fff; font-family:'Fredoka',sans-serif; font-weight:600; font-size:1rem;
-  padding:13px; cursor:pointer;
-}
-.save-btn:disabled{opacity:.5; cursor:default;}
-
+.mood-opt .em{font-size:1.45rem; display:block; line-height:1.2;}
+.mood-opt .lb{font-size:.58rem; font-weight:700; color:var(--ink-soft); margin-top:3px; display:block; line-height:1.2;}
+.mood-opt.selected{border-color:var(--rose); background:color-mix(in srgb,var(--rose) 16%,var(--surface-2));}
 .friend-pick{
-  display:flex; align-items:center; gap:10px; padding:10px;
-  border-radius:14px; border:1.5px solid var(--border); margin-bottom:8px; cursor:pointer;
+  display:flex; align-items:center; gap:10px; padding:10px; border-radius:14px;
+  border:1.5px solid var(--border); margin-bottom:8px; cursor:pointer;
 }
-.friend-pick.selected{border-color:var(--gold); background:color-mix(in srgb, var(--gold) 16%, var(--surface));}
+.friend-pick.selected{border-color:var(--gold); background:color-mix(in srgb,var(--gold) 16%,var(--surface));}
+.hint{font-size:.72rem; color:var(--ink-soft); text-align:center; margin-top:10px; line-height:1.5;}
+.settings-row{
+  display:flex; align-items:center; gap:10px; padding:13px 12px; border-radius:14px;
+  border:1px solid var(--border); background:var(--surface-2); margin-bottom:9px;
+  cursor:pointer; font-weight:600; font-size:.9rem;
+}
+.settings-row.danger{color:var(--danger);}
 
-.calendar-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
-.cal-dow{font-size:.62rem; text-align:center; color:var(--ink-soft); font-weight:700;}
+.calendar-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:5px;}
+.cal-dow{font-size:.6rem; text-align:center; color:var(--ink-soft); font-weight:700; padding-bottom:2px;}
 .cal-day{
-  aspect-ratio:1; border-radius:12px; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; font-size:.72rem; font-weight:700;
-  background:var(--surface-2); border:1px solid var(--border); color:var(--ink-soft);
-  cursor:default; gap:2px;
+  aspect-ratio:1; border-radius:11px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; font-size:.68rem; font-weight:700;
+  background:var(--surface-2); border:1px solid var(--border); color:var(--ink-soft); gap:1px;
 }
 .cal-day.has-entry{color:#fff; border:none;}
-.cal-day .em{font-size:.9rem;}
-.streak-banner{
-  font-family:'Caveat',cursive; font-size:1.3rem; text-align:center; color:var(--rose-deep);
-  margin:14px 0 4px;
-}
+.cal-day .em{font-size:.85rem;}
+.streak-banner{font-family:'Caveat',cursive; font-size:1.3rem; text-align:center; color:var(--rose-deep); margin:10px 0 14px;}
 .journal-note{
-  margin-top:16px; background:var(--surface-2); border-radius:16px; padding:14px;
-  border:1px solid var(--border);
+  margin-top:9px; background:var(--surface-2); border-radius:15px;
+  padding:11px 14px; border:1px solid var(--border);
+  display:flex; align-items:center; gap:11px;
 }
-.journal-note .jdate{font-size:.7rem; color:var(--ink-soft); font-weight:700;}
-.journal-note .jtext{font-family:'Caveat',cursive; font-size:1.2rem; margin-top:2px;}
+.jdate{font-size:.66rem; color:var(--ink-soft); font-weight:700; text-transform:uppercase; letter-spacing:.05em;}
+.jtext{font-family:'Caveat',cursive; font-size:1.2rem; margin-top:-1px;}
 
-.match-overlay{
-  position:absolute; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
-  flex-direction:column; background:rgba(74,46,69,0.55); opacity:0; pointer-events:none; transition:opacity .3s;
-  text-align:center; padding:30px;
+.overlay{
+  position:absolute; inset:0; z-index:60; display:flex; align-items:center; justify-content:center;
+  flex-direction:column; background:rgba(74,46,69,.6); text-align:center; padding:28px;
+  opacity:0; pointer-events:none; transition:opacity .3s;
 }
-.match-overlay.show{opacity:1; pointer-events:auto;}
-.match-overlay h2{font-family:'Fredoka',sans-serif; color:#fff; font-size:1.4rem;}
-.match-overlay p{color:#fff; font-family:'Caveat',cursive; font-size:1.3rem; margin-top:6px;}
-.heart{
-  position:absolute; bottom:-20px; font-size:1.6rem; animation:rise 2.6s ease-in forwards;
+.overlay.show{opacity:1; pointer-events:auto;}
+.overlay h2{font-family:'Fredoka',sans-serif; color:#fff; font-size:1.35rem; margin:0;}
+.overlay p{color:#fff; font-family:'Caveat',cursive; font-size:1.3rem; margin:6px 0 0;}
+.heart{position:absolute; bottom:-30px; font-size:1.6rem; animation:rise 2.6s ease-in forwards;}
+@keyframes rise{0%{transform:translateY(0) scale(.8); opacity:1;} 100%{transform:translateY(-660px) scale(1.2); opacity:0;}}
+@media (prefers-reduced-motion: reduce){.heart{display:none;}}
+
+.toast{
+  position:absolute; left:50%; transform:translateX(-50%) translateY(20px);
+  bottom:calc(150px + env(safe-area-inset-bottom));
+  background:var(--ink); color:var(--surface); padding:10px 18px; border-radius:999px;
+  font-size:.82rem; font-weight:700; z-index:70; opacity:0; transition:all .25s;
+  pointer-events:none; max-width:80%; text-align:center;
 }
-@keyframes rise{
-  0%{transform:translateY(0) scale(.8); opacity:1;}
-  100%{transform:translateY(-620px) scale(1.2); opacity:0;}
-}
-@media (prefers-reduced-motion: reduce){
-  .heart{display:none;}
-  .save-btn,.fab,.react-btn{transition:none;}
-}
-.empty-state{
-  text-align:center; color:var(--ink-soft); padding:40px 20px; font-family:'Quicksand',sans-serif;
-}
-.hint-banner{
-  font-size:.72rem; color:var(--ink-soft); text-align:center; margin-top:10px; line-height:1.5;
-}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 </style>
+</head>
+<body>
+<div class="phone">
 
-<div class="stage">
-  <div class="phone" id="phone">
-    <div class="notch"></div>
-    <div class="app-header">
-      <div class="brand"><span class="dot">🩷</span>MoodLove</div>
-      <div class="header-actions">
-        <button class="streak-chip" id="streakChip" title="Jours de suite où tout le monde a partagé son humeur">🔥 <span id="streakNum">0</span></button>
-        <button class="icon-btn" id="petitAmiSettingsBtn" title="Choisir mon petit ami">💕</button>
-      </div>
-    </div>
+  <div id="loadingScreen">
+    <div class="load-heart">🩷</div>
+    <div class="load-text">On prépare tes humeurs...</div>
+  </div>
 
-    <div class="tabs-view" id="homeView">
-      <div class="section-label">Mon petit ami</div>
-      <div id="petitAmiSlot"></div>
+  <!-- Connexion / inscription -->
+  <div class="fullscreen" id="authScreen">
+    <div class="ob-brand">MoodLove</div>
+    <div class="ob-sub" id="authSub">Content de te revoir 🩷</div>
+    <div class="field-label">Ton e-mail</div>
+    <input type="email" id="authEmail" autocomplete="email" inputmode="email" placeholder="rania@exemple.com">
+    <div class="field-label">Ton mot de passe</div>
+    <input type="password" id="authPassword" autocomplete="current-password" placeholder="6 caractères minimum">
+    <button class="primary-btn" id="authSubmit">Se connecter</button>
+    <div class="auth-error" id="authError"></div>
+    <button class="link-btn" id="authToggle">Pas encore de compte ? Créer un compte</button>
+  </div>
 
-      <div class="section-label">Mes amies</div>
-      <div id="friendsList"><div class="empty-state">Personne n'a encore partagé son humeur 🤍</div></div>
-    </div>
+  <!-- Profil (1ère connexion) -->
+  <div class="fullscreen" id="onboarding">
+    <div class="ob-brand">Bienvenue 💕</div>
+    <div class="ob-sub">Comment tes amies vont te reconnaître ?</div>
+    <div class="field-label">Ton prénom</div>
+    <input type="text" id="obName" maxlength="18" placeholder="Rania" autocomplete="given-name">
+    <div class="field-label" style="margin-top:6px;">Ton avatar</div>
+    <div class="emoji-grid" id="obEmojiGrid"></div>
+    <button class="primary-btn" id="obSaveBtn" disabled>C'est parti 💕</button>
+  </div>
 
-    <div class="tabs-view" id="journalView" style="display:none;">
-      <div class="section-label">Ton journal d'humeur</div>
-      <div class="streak-banner" id="journalStreakLine">Continue comme ça 💫</div>
-      <div class="calendar-grid" id="calGrid"></div>
-      <div id="journalNotes"></div>
-    </div>
-
-    <button class="fab" id="fabBtn">+</button>
-
-    <div class="bottom-nav">
-      <button class="nav-btn active" id="navHome"><span class="nav-ic">🏡</span>Accueil</button>
-      <button class="nav-btn" id="navJournal"><span class="nav-ic">📔</span>Journal</button>
-    </div>
-
-    <div class="sheet-scrim" id="moodSheet">
-      <div class="sheet">
-        <div class="sheet-handle"></div>
-        <h3>Comment tu te sens ?</h3>
-        <div class="mood-grid" id="moodGrid"></div>
-        <textarea id="moodMessage" maxlength="80" placeholder="Un petit mot (optionnel)..."></textarea>
-        <button class="save-btn" id="saveMoodBtn" disabled>Partager mon humeur</button>
-      </div>
-    </div>
-
-    <div class="sheet-scrim" id="petitAmiSheet">
-      <div class="sheet">
-        <div class="sheet-handle"></div>
-        <h3>Qui est ton petit ami 💕 ?</h3>
-        <div id="friendPickList"></div>
-        <div class="hint-banner">Il doit d'abord ouvrir MoodLove et partager une humeur une fois pour apparaître ici.</div>
-      </div>
-    </div>
-
-    <div class="match-overlay" id="matchOverlay">
-      <h2>Même vibe, même moment ✨</h2>
-      <p id="matchText"></p>
+  <div class="app-header">
+    <div class="brand"><span>🩷</span>MoodLove</div>
+    <div class="header-actions">
+      <button class="streak-chip" id="streakChip" title="Jours de suite où tout le monde a partagé son humeur">🔥 <span id="streakNum">0</span></button>
+      <button class="icon-btn" id="inviteBtn" title="Inviter une amie">➕</button>
+      <button class="icon-btn" id="settingsBtn" title="Réglages">⚙️</button>
     </div>
   </div>
+
+  <div class="view" id="homeView">
+    <div class="section-label">Mon humeur</div>
+    <div id="mySlot"></div>
+    <div class="section-label">Mon petit ami</div>
+    <div id="petitAmiSlot"></div>
+    <div class="section-label">Mes amies</div>
+    <div id="friendsList"></div>
+  </div>
+
+  <div class="view" id="journalView" style="display:none;">
+    <div class="section-label">Ton journal d'humeur</div>
+    <div class="streak-banner" id="journalStreakLine"></div>
+    <div class="calendar-grid" id="calGrid"></div>
+    <div class="section-label">Tes dernières humeurs</div>
+    <div id="journalNotes"></div>
+  </div>
+
+  <button class="fab" id="fabBtn">+</button>
+
+  <div class="bottom-nav">
+    <button class="nav-btn active" id="navHome"><span class="nav-ic">🏡</span>Accueil</button>
+    <button class="nav-btn" id="navJournal"><span class="nav-ic">📔</span>Journal</button>
+  </div>
+
+  <div class="scrim" id="moodSheet">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h3>Comment tu te sens là, maintenant ?</h3>
+      <div id="moodPicker"></div>
+    </div>
+  </div>
+
+  <div class="scrim" id="petitAmiSheet">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h3>Qui est ton petit ami 💕 ?</h3>
+      <div id="friendPickList"></div>
+      <div class="hint">Il doit d'abord créer son compte MoodLove pour apparaître ici.</div>
+    </div>
+  </div>
+
+  <div class="scrim" id="settingsSheet">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h3>Réglages</h3>
+      <div class="settings-row" id="setPetitAmiRow">💕 <span>Choisir mon petit ami</span></div>
+      <div class="settings-row" id="setInviteRow">➕ <span>Inviter une amie</span></div>
+      <div class="settings-row danger" id="logoutRow">👋 <span>Se déconnecter</span></div>
+      <div class="hint" id="accountHint"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="matchOverlay">
+    <h2>Même vibe, même moment ✨</h2>
+    <p id="matchText"></p>
+  </div>
+
+  <div class="toast" id="toast"></div>
 </div>
 
-<script>
-const MOODS = [
-  {key:'amour', emoji:'🥰', label:'Amoureuse', color:'#FF6FA0'},
-  {key:'top', emoji:'😄', label:'Trop bien', color:'#F4A65A'},
-  {key:'zen', emoji:'😌', label:'Zen', color:'#B08CF2'},
-  {key:'fatigue', emoji:'😴', label:'Fatiguée', color:'#8FA6D9'},
-  {key:'sensible', emoji:'🥹', label:'Sensible', color:'#FF9EC4'},
-  {key:'stress', emoji:'😤', label:'Stressée', color:'#F17A6B'},
-  {key:'triste', emoji:'😢', label:'Pas ouf', color:'#A98BAE'},
-  {key:'malade', emoji:'🤒', label:'Malade', color:'#8FBF9B'},
-];
-const moodByKey = Object.fromEntries(MOODS.map(m=>[m.key,m]));
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js';
+import {
+  getAuth, onAuthStateChanged, signOut,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword
+} from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js';
+import {
+  getFirestore, doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, onSnapshot
+} from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js';
 
-let db=null, userCap=null, myId=null;
-let latestMoods={}; // uid -> {data, id}
-let myHistory=[];
-let groupHistory=[];
-let petitAmiId=null;
-let selectedMoodKey=null;
-let unsubMoods=null, unsubReactions=null, unsubHistory=null, unsubSettings=null, unsubGroupHistory=null;
-let latestReactions={};
-let celebratedKey=null;
-const MATCH_WINDOW_MS = 20*60*1000;
+const firebaseConfig = {
+  apiKey: "AIzaSyDOP25iIcS695grIyvM8wt6zmyKBCLIo6I",
+  authDomain: "moodlove-d5391.firebaseapp.com",
+  projectId: "moodlove-d5391",
+  storageBucket: "moodlove-d5391.firebasestorage.app",
+  messagingSenderId: "940738478538",
+  appId: "1:940738478538:web:537a3c9814d2aa99bc4f33"
+};
+
+const fb = initializeApp(firebaseConfig);
+const auth = getAuth(fb);
+const db = getFirestore(fb);
+
+const MOOD_GROUPS = [
+  { id:'bien', label:'Ça va 💕', moods:[
+    {key:'amoureuse',   emoji:'🥰', label:'Amoureuse',   color:'#FF6FA0'},
+    {key:'craquante',   emoji:'😍', label:'Craquante',   color:'#F65C9A'},
+    {key:'excitee',     emoji:'🤩', label:'Excitée',     color:'#FF8E4A'},
+    {key:'fete',        emoji:'🥳', label:'En fête',     color:'#FFA3C7'},
+    {key:'tropbien',    emoji:'😄', label:'Trop bien',   color:'#F4A65A'},
+    {key:'contente',    emoji:'😊', label:'Contente',    color:'#FFB77A'},
+    {key:'reconnaissante', emoji:'🫶', label:'Reconnaissante', color:'#E79ACB'},
+    {key:'inspiree',    emoji:'✨', label:'Inspirée',    color:'#D9A3F0'},
+    {key:'motivee',     emoji:'💪', label:'Motivée',     color:'#F58F6E'},
+    {key:'confiante',   emoji:'😎', label:'Confiante',   color:'#C79BEF'},
+    {key:'caline',      emoji:'🤗', label:'Câline',      color:'#FF9EC4'},
+    {key:'zen',         emoji:'😌', label:'Zen',         color:'#B08CF2'},
+    {key:'sereine',     emoji:'😇', label:'Sereine',     color:'#A8C7F0'},
+    {key:'emue',        emoji:'🥹', label:'Émue',        color:'#FFAFD0'}
+  ]},
+  { id:'bof', label:'Bof 😐', moods:[
+    {key:'fatiguee',    emoji:'😴', label:'Fatiguée',    color:'#8FA6D9'},
+    {key:'crevee',      emoji:'🥱', label:'Crevée',      color:'#7E93C4'},
+    {key:'bof',         emoji:'😐', label:'Bof',         color:'#A9A3B8'},
+    {key:'pensive',     emoji:'🤔', label:'Pensive',     color:'#9BA9D0'},
+    {key:'fondue',      emoji:'🫠', label:'Fondue',      color:'#C0A6CF'},
+    {key:'perdue',      emoji:'😶‍🌫️', label:'Perdue',   color:'#A6ADBD'},
+    {key:'flou',        emoji:'🥴', label:'Dans le flou', color:'#B3A0C7'},
+    {key:'bizarre',     emoji:'🙃', label:'Bizarre',     color:'#C2A8BC'}
+  ]},
+  { id:'pasbien', label:'Ça va pas 🤍', moods:[
+    {key:'stressee',    emoji:'😤', label:'Stressée',    color:'#F17A6B'},
+    {key:'anxieuse',    emoji:'😰', label:'Anxieuse',    color:'#D98B7E'},
+    {key:'enervee',     emoji:'😠', label:'Énervée',     color:'#E06A63'},
+    {key:'agacee',      emoji:'🙄', label:'Agacée',      color:'#C98598'},
+    {key:'triste',      emoji:'😢', label:'Triste',      color:'#A98BAE'},
+    {key:'aubout',      emoji:'😭', label:'Au bout',     color:'#96789E'},
+    {key:'decue',       emoji:'😔', label:'Déçue',       color:'#8E8AAE'},
+    {key:'sensible',    emoji:'🥺', label:'Sensible',    color:'#E6A0BE'},
+    {key:'genee',       emoji:'😳', label:'Gênée',       color:'#DDA0A8'},
+    {key:'malade',      emoji:'🤒', label:'Malade',      color:'#8FBF9B'},
+    {key:'pasenforme',  emoji:'🤕', label:'Pas en forme', color:'#9DBFA5'},
+    {key:'panique',     emoji:'😱', label:'Panique',     color:'#C77B7B'}
+  ]}
+];
+const MOODS = MOOD_GROUPS.flatMap(g => g.moods);
+const moodByKey = Object.fromEntries(MOODS.map(m => [m.key, m]));
+const AVATARS = ['🌸','🦋','🍓','⭐️','🌙','🐰','🧸','🌺','🍒','🦄','💐','🐨','🍰','🌷','🐣','☁️','🎀','🍑'];
+const MATCH_WINDOW_MS = 20 * 60 * 1000;
+const HISTORY_DAYS = 45;
+
+let myId = null, myEmail = null;
+let profiles = {}, latestMoods = {}, reactions = {}, recentHistory = [];
+let petitAmiId = null, obEmoji = null, celebratedKey = null;
+let isSignupMode = false;
+let unsubs = [];
+let refreshTimer = null;
+
+const $ = id => document.getElementById(id);
 
 function timeAgo(ts){
   if(!ts) return '';
-  const s=Math.floor((Date.now()-ts)/1000);
-  if(s<60) return "à l'instant";
-  const m=Math.floor(s/60);
-  if(m<60) return m+' min';
-  const h=Math.floor(m/60);
-  if(h<24) return h+' h';
-  const d=Math.floor(h/24);
-  return d+' j';
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if(s < 60) return "à l'instant";
+  const m = Math.floor(s / 60);
+  if(m < 60) return 'il y a ' + m + ' min';
+  const h = Math.floor(m / 60);
+  if(h < 24) return 'il y a ' + h + ' h';
+  return 'il y a ' + Math.floor(h / 24) + ' j';
 }
 function dayKey(ts){
-  const d=new Date(ts);
-  return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+  const d = new Date(ts);
+  return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+}
+function showToast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s ?? '';
+  return d.innerHTML;
+}
+const nameOf = uid => (profiles[uid] && profiles[uid].name) || 'Quelqu\'un';
+const avatarOf = uid => (profiles[uid] && profiles[uid].emoji) || '🤍';
+
+/* ---------- Connexion ---------- */
+
+function authErrorMessage(code){
+  switch(code){
+    case 'auth/invalid-email': return "Cette adresse e-mail n'est pas valide.";
+    case 'auth/missing-password': return "N'oublie pas ton mot de passe.";
+    case 'auth/weak-password': return 'Ton mot de passe doit faire au moins 6 caractères.';
+    case 'auth/email-already-in-use': return 'Un compte existe déjà avec cet e-mail. Connecte-toi.';
+    case 'auth/invalid-credential':
+    case 'auth/wrong-password':
+    case 'auth/user-not-found': return 'E-mail ou mot de passe incorrect.';
+    case 'auth/too-many-requests': return 'Trop de tentatives. Réessaie dans quelques minutes.';
+    case 'auth/network-request-failed': return 'Pas de connexion internet.';
+    default: return 'Un problème est survenu. Réessaie.';
+  }
+}
+function setAuthMode(signup){
+  isSignupMode = signup;
+  $('authSub').textContent = signup ? 'Crée ton compte en 10 secondes' : 'Content de te revoir 🩷';
+  $('authSubmit').textContent = signup ? 'Créer mon compte' : 'Se connecter';
+  $('authToggle').textContent = signup ? "Déjà un compte ? Se connecter" : "Pas encore de compte ? Créer un compte";
+  $('authPassword').setAttribute('autocomplete', signup ? 'new-password' : 'current-password');
+  $('authError').textContent = '';
+}
+async function submitAuth(){
+  const email = $('authEmail').value.trim();
+  const password = $('authPassword').value;
+  const btn = $('authSubmit');
+  $('authError').textContent = '';
+  if(!email || !password){
+    $('authError').textContent = 'Remplis ton e-mail et ton mot de passe.';
+    return;
+  }
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = '...';
+  try{
+    if(isSignupMode) await createUserWithEmailAndPassword(auth, email, password);
+    else await signInWithEmailAndPassword(auth, email, password);
+    $('authPassword').value = '';
+  }catch(e){
+    $('authError').textContent = authErrorMessage(e.code);
+    btn.disabled = false;
+    btn.textContent = original;
+  }
 }
 
-function buildMoodGrid(){
-  const grid=document.getElementById('moodGrid');
-  grid.innerHTML='';
-  MOODS.forEach(m=>{
-    const el=document.createElement('div');
-    el.className='mood-opt';
-    el.innerHTML=`<span class="em">${m.emoji}</span><span class="lb">${m.label}</span>`;
-    el.addEventListener('click',()=>{
-      selectedMoodKey=m.key;
-      document.querySelectorAll('.mood-opt').forEach(o=>o.classList.remove('selected'));
-      el.classList.add('selected');
-      document.getElementById('saveMoodBtn').disabled=false;
+/* ---------- Profil ---------- */
+
+function buildOnboarding(){
+  const grid = $('obEmojiGrid');
+  AVATARS.forEach(em => {
+    const b = document.createElement('button');
+    b.className = 'emoji-opt';
+    b.textContent = em;
+    b.addEventListener('click', () => {
+      obEmoji = em;
+      grid.querySelectorAll('.emoji-opt').forEach(o => o.classList.remove('selected'));
+      b.classList.add('selected');
+      validateOnboarding();
     });
-    grid.appendChild(el);
+    grid.appendChild(b);
+  });
+  $('obName').addEventListener('input', validateOnboarding);
+  $('obSaveBtn').addEventListener('click', saveProfile);
+}
+function validateOnboarding(){
+  $('obSaveBtn').disabled = !($('obName').value.trim() && obEmoji);
+}
+async function saveProfile(){
+  const btn = $('obSaveBtn');
+  btn.disabled = true;
+  btn.textContent = '...';
+  try{
+    await setDoc(doc(db, 'profiles', myId), {
+      name: $('obName').value.trim(), emoji: obEmoji, joinedAt: Date.now()
+    });
+    $('onboarding').classList.remove('show');
+    startApp();
+  }catch(e){
+    btn.disabled = false;
+    btn.textContent = "C'est parti 💕";
+    showToast("Impossible d'enregistrer, réessaie");
+  }
+}
+
+/* ---------- Affichage ---------- */
+
+function moodLabel(entry){
+  const m = entry && moodByKey[entry.moodKey];
+  return m ? m.label : '';
+}
+
+function renderHome(){
+  const mine = latestMoods[myId];
+  const myMood = mine ? moodByKey[mine.moodKey] : null;
+  $('mySlot').innerHTML = `
+    <div class="my-card">
+      <div class="avatar" style="background:${myMood ? myMood.color : 'var(--surface-2)'}">${myMood ? myMood.emoji : avatarOf(myId)}</div>
+      <div class="who-block">
+        <div class="who-name">${escapeHtml(nameOf(myId))} <span style="color:var(--ink-soft);font-weight:500;font-size:.8rem;">(toi)</span></div>
+        <div class="mood-line">${mine ? escapeHtml(moodLabel(mine)) : 'Appuie sur + pour partager ton humeur'}</div>
+        <div class="time-ago">${mine ? timeAgo(mine.updatedAt) : ''}</div>
+      </div>
+    </div>`;
+
+  const slot = $('petitAmiSlot');
+  if(!petitAmiId){
+    slot.innerHTML = `<div class="empty-petit-ami" id="setPaBtn"><div class="plus-circle">+</div><div>Épingle ton petit ami ici pour voir son humeur en premier</div></div>`;
+    $('setPaBtn').addEventListener('click', openPetitAmiSheet);
+  } else {
+    const entry = latestMoods[petitAmiId];
+    const mood = entry ? moodByKey[entry.moodKey] : null;
+    const reac = reactions[petitAmiId];
+    slot.innerHTML = `
+      <div class="petit-ami-card">
+        <div class="avatar" style="background:${mood ? mood.color : 'var(--surface-2)'}">${mood ? mood.emoji : avatarOf(petitAmiId)}</div>
+        <div class="who-block">
+          <div class="who-name">👑 ${escapeHtml(nameOf(petitAmiId))}</div>
+          <div class="mood-line">${entry ? escapeHtml(moodLabel(entry)) : "Pas encore d'humeur partagée"}</div>
+          <div class="time-ago">${entry ? timeAgo(entry.updatedAt) : ''}</div>
+          ${reac ? `<div class="reaction-badge">${reac.emoji} envoyé</div>` : ''}
+        </div>
+        <button class="react-btn" id="paReact">💌</button>
+      </div>`;
+    $('paReact').addEventListener('click', () => sendReaction(petitAmiId, '💌'));
+  }
+
+  const list = $('friendsList');
+  const others = Object.keys(profiles)
+    .filter(id => id !== myId && id !== petitAmiId)
+    .map(id => ({ id, mood: latestMoods[id] }))
+    .sort((a, b) => ((b.mood && b.mood.updatedAt) || 0) - ((a.mood && a.mood.updatedAt) || 0));
+
+  if(others.length === 0){
+    list.innerHTML = `<div class="empty-state">Tes amies n'ont pas encore rejoint 🤍<br>Appuie sur ➕ en haut pour leur envoyer le lien.</div>`;
+    return;
+  }
+  list.innerHTML = '';
+  others.forEach(o => {
+    const mood = o.mood ? moodByKey[o.mood.moodKey] : null;
+    const reac = reactions[o.id];
+    const row = document.createElement('div');
+    row.className = 'friend-row';
+    row.innerHTML = `
+      <div class="avatar" style="background:${mood ? mood.color : 'var(--surface-2)'}">${mood ? mood.emoji : avatarOf(o.id)}</div>
+      <div class="who-block">
+        <div class="who-name">${escapeHtml(nameOf(o.id))}</div>
+        <div class="mood-line">${o.mood ? escapeHtml(moodLabel(o.mood)) : 'Pas encore partagé'}</div>
+        <div class="time-ago">${o.mood ? timeAgo(o.mood.updatedAt) : ''}</div>
+        ${reac ? `<div class="reaction-badge">${reac.emoji} envoyé</div>` : ''}
+      </div>
+      <button class="react-btn">💗</button>`;
+    row.querySelector('.react-btn').addEventListener('click', () => sendReaction(o.id, '💗'));
+    list.appendChild(row);
   });
 }
 
-function openSheet(id){ document.getElementById(id).classList.add('open'); }
-function closeSheet(id){ document.getElementById(id).classList.remove('open'); }
-
-async function renderProfilesInto(ids){
-  if(!userCap) return {};
-  const uniq=[...new Set(ids.filter(Boolean))];
-  if(uniq.length===0) return {};
-  return await userCap.profiles(uniq);
+/* ---------- Flamme du groupe ---------- */
+// Jours consécutifs où TOUT LE MONDE (toi + tes amies) a partagé au moins une humeur.
+function computeGroupStreak(){
+  const roster = Object.keys(profiles);
+  if(roster.length === 0) return 0;
+  const byDay = {};
+  recentHistory.forEach(h => {
+    const dk = dayKey(h.at);
+    (byDay[dk] = byDay[dk] || new Set()).add(h.uid);
+  });
+  const everyone = dk => {
+    const set = byDay[dk];
+    return !!set && roster.every(id => set.has(id));
+  };
+  const cursor = new Date();
+  if(!everyone(dayKey(cursor.getTime()))){
+    cursor.setDate(cursor.getDate() - 1);
+    if(!everyone(dayKey(cursor.getTime()))) return 0;
+  }
+  let streak = 0;
+  while(everyone(dayKey(cursor.getTime()))){
+    streak++;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
+}
+function renderStreak(){
+  const n = computeGroupStreak();
+  $('streakNum').textContent = n;
+  $('streakChip').classList.toggle('hot', n > 0);
 }
 
-async function renderHome(){
-  const ids=Object.keys(latestMoods);
-  const profiles=await renderProfilesInto([...ids, petitAmiId].filter(Boolean));
+/* ---------- Journal ---------- */
 
-  // Petit ami slot
-  const slot=document.getElementById('petitAmiSlot');
-  if(!petitAmiId){
-    slot.innerHTML=`<div class="empty-petit-ami" id="setPaBtn"><div class="plus-circle">+</div><div>Ajoute ton petit ami pour épingler son humeur ici</div></div>`;
-    document.getElementById('setPaBtn').addEventListener('click', openPetitAmiSheet);
-  } else {
-    const entry=latestMoods[petitAmiId];
-    const prof=profiles[petitAmiId] || {name:'',avatarUrl:'',color:'#ccc'};
-    const mood=entry ? moodByKey[entry.data.moodKey] : null;
-    slot.innerHTML=`
-      <div class="petit-ami-card" id="paCard">
-        <div class="halo"></div>
-        <div class="avatar" style="background:${mood?mood.color:'#e5d7e2'}; color:#fff;">${mood?mood.emoji:'🤍'}</div>
-        <div class="who-block">
-          <div class="who-name"><span class="crown">👑</span>${escapeHtml(prof.name||'Ton amour')}</div>
-          <div class="mood-line">${entry ? escapeHtml(entry.data.message||mood.label) : "Pas encore d'humeur partagée"}</div>
-          <div class="time-ago">${entry?timeAgo(entry.data.updatedAt):''}</div>
-        </div>
-        ${entry?`<button class="react-btn" data-uid="${petitAmiId}">💌</button>`:''}
+function renderJournal(){
+  const myHistory = recentHistory.filter(h => h.uid === myId);
+  const days = new Set(myHistory.map(h => dayKey(h.at)));
+  let personal = 0;
+  const cur = new Date();
+  if(!days.has(dayKey(cur.getTime()))) cur.setDate(cur.getDate() - 1);
+  while(days.has(dayKey(cur.getTime()))){ personal++; cur.setDate(cur.getDate() - 1); }
+  $('journalStreakLine').textContent = personal > 0
+    ? `${personal} jour${personal > 1 ? 's' : ''} de suite à te confier 🔥`
+    : 'Partage ton humeur pour démarrer ta série ✨';
+
+  const now = new Date();
+  const year = now.getFullYear(), month = now.getMonth();
+  const firstDow = (new Date(year, month, 1).getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const byDay = {};
+  myHistory.forEach(h => {
+    const d = new Date(h.at);
+    if(d.getFullYear() === year && d.getMonth() === month){
+      const day = d.getDate();
+      if(!byDay[day] || h.at > byDay[day].at) byDay[day] = h;
+    }
+  });
+  const grid = $('calGrid');
+  grid.innerHTML = '';
+  ['L','M','M','J','V','S','D'].forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dow';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+  for(let i = 0; i < firstDow; i++) grid.appendChild(document.createElement('div'));
+  for(let day = 1; day <= daysInMonth; day++){
+    const entry = byDay[day];
+    const mood = entry ? moodByKey[entry.moodKey] : null;
+    const el = document.createElement('div');
+    el.className = 'cal-day' + (mood ? ' has-entry' : '');
+    if(mood) el.style.background = mood.color;
+    el.innerHTML = mood ? `<span class="em">${mood.emoji}</span><span>${day}</span>` : `<span>${day}</span>`;
+    grid.appendChild(el);
+  }
+
+  const notes = $('journalNotes');
+  notes.innerHTML = '';
+  if(myHistory.length === 0){
+    notes.innerHTML = `<div class="empty-state">Ton journal se remplira dès ta première humeur 🤍</div>`;
+    return;
+  }
+  myHistory.slice(0, 12).forEach(h => {
+    const mood = moodByKey[h.moodKey];
+    if(!mood) return;
+    const d = new Date(h.at);
+    const div = document.createElement('div');
+    div.className = 'journal-note';
+    div.innerHTML = `
+      <div class="avatar" style="width:38px;height:38px;font-size:1.15rem;background:${mood.color}">${mood.emoji}</div>
+      <div>
+        <div class="jdate">${d.toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'short'})} · ${d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</div>
+        <div class="jtext">${escapeHtml(mood.label)}</div>
       </div>`;
-    document.getElementById('paCard').addEventListener('click',(e)=>{
-      if(e.target.closest('.react-btn')) return;
-      openPetitAmiSheet();
-    });
-    const rb=slot.querySelector('.react-btn');
-    if(rb) rb.addEventListener('click',(e)=>{e.stopPropagation(); sendReaction(petitAmiId,'💌');});
-  }
-
-  // Friends list (everyone except petit ami), sorted by recency
-  const list=document.getElementById('friendsList');
-  const others=ids.filter(id=>id!==petitAmiId && id!==myId)
-    .map(id=>({id,...latestMoods[id]}))
-    .sort((a,b)=>(b.data.updatedAt||0)-(a.data.updatedAt||0));
-  if(others.length===0){
-    list.innerHTML='<div class="empty-state">Personne d\'autre n\'a encore partagé son humeur 🤍</div>';
-  } else {
-    list.innerHTML='';
-    others.forEach(o=>{
-      const mood=moodByKey[o.data.moodKey];
-      const prof=profiles[o.id]||{name:'',color:'#ccc'};
-      const reaction=latestReactions[o.id];
-      const row=document.createElement('div');
-      row.className='friend-row';
-      row.innerHTML=`
-        <div class="avatar" style="background:${mood.color}; color:#fff;">${mood.emoji}</div>
-        <div class="who-block">
-          <div class="who-name">${escapeHtml(prof.name||'Une amie')}</div>
-          <div class="mood-line">${escapeHtml(o.data.message||mood.label)}</div>
-          <div class="time-ago">${timeAgo(o.data.updatedAt)}</div>
-          ${reaction?`<div class="reaction-badge">${reaction.emoji} reçu</div>`:''}
-        </div>
-        <button class="react-btn" data-uid="${o.id}">💗</button>`;
-      row.querySelector('.react-btn').addEventListener('click',()=>sendReaction(o.id,'💗'));
-      list.appendChild(row);
-    });
-  }
+    notes.appendChild(div);
+  });
 }
 
-function escapeHtml(s){
-  const d=document.createElement('div'); d.textContent=s??''; return d.innerHTML;
+/* ---------- Mood Match (même humeur, au même moment) ---------- */
+
+function checkMoodMatch(){
+  if(!petitAmiId || !myId) return;
+  const mine = latestMoods[myId], theirs = latestMoods[petitAmiId];
+  if(!mine || !theirs || mine.moodKey !== theirs.moodKey) return;
+  if(Math.abs((mine.updatedAt || 0) - (theirs.updatedAt || 0)) > MATCH_WINDOW_MS) return;
+  const key = mine.moodKey + ':' + mine.updatedAt + ':' + theirs.updatedAt;
+  if(celebratedKey === key) return;
+  let seen = null;
+  try{ seen = localStorage.getItem('moodlove-match'); }catch(e){}
+  if(seen === key) return;
+  celebratedKey = key;
+  try{ localStorage.setItem('moodlove-match', key); }catch(e){}
+  showMatch(moodByKey[mine.moodKey]);
 }
+function showMatch(mood){
+  const ov = $('matchOverlay');
+  $('matchText').textContent = `Vous ressentez tous les deux : ${mood.emoji} ${mood.label}`;
+  ov.classList.add('show');
+  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    for(let i = 0; i < 14; i++){
+      setTimeout(() => {
+        const h = document.createElement('div');
+        h.className = 'heart';
+        h.textContent = ['💗','💕','✨','🩷'][Math.floor(Math.random() * 4)];
+        h.style.left = (10 + Math.random() * 80) + '%';
+        ov.appendChild(h);
+        setTimeout(() => h.remove(), 2700);
+      }, i * 110);
+    }
+  }
+  setTimeout(() => ov.classList.remove('show'), 3400);
+}
+
+/* ---------- Actions ---------- */
 
 async function sendReaction(toUid, emoji){
-  if(!db || !myId) return;
   try{
-    await db.collection('reactions').doc(toUid).set({from:myId, emoji, at:Date.now()});
-  }catch(e){}
+    await setDoc(doc(db, 'reactions', toUid), { from: myId, emoji, at: Date.now() });
+    showToast(emoji + ' envoyé à ' + nameOf(toUid));
+  }catch(e){ showToast('Envoi impossible'); }
 }
 
-async function openPetitAmiSheet(){
-  const ids=Object.keys(latestMoods).filter(id=>id!==myId);
-  const profiles=await renderProfilesInto(ids);
-  const list=document.getElementById('friendPickList');
-  if(ids.length===0){
-    list.innerHTML='<div class="empty-state">Aucune amie n\'a encore ouvert MoodLove.</div>';
+async function saveMood(moodKey){
+  const now = Date.now();
+  closeSheet('moodSheet');
+  try{
+    await setDoc(doc(db, 'moods', myId), { moodKey, updatedAt: now });
+    await addDoc(collection(db, 'history'), { uid: myId, moodKey, at: now });
+    showToast(moodByKey[moodKey].emoji + ' humeur partagée');
+  }catch(e){ showToast('Impossible de partager, réessaie'); }
+}
+
+function openSheet(id){ $(id).classList.add('open'); }
+function closeSheet(id){ $(id).classList.remove('open'); }
+
+function openPetitAmiSheet(){
+  closeSheet('settingsSheet');
+  const ids = Object.keys(profiles).filter(id => id !== myId);
+  const list = $('friendPickList');
+  if(ids.length === 0){
+    list.innerHTML = `<div class="empty-state">Personne n'a encore rejoint MoodLove.</div>`;
   } else {
-    list.innerHTML='';
-    ids.forEach(id=>{
-      const prof=profiles[id]||{name:'Quelqu\'un'};
-      const row=document.createElement('div');
-      row.className='friend-pick'+(id===petitAmiId?' selected':'');
-      row.innerHTML=`<div class="avatar" style="background:var(--rose); color:#fff; width:36px; height:36px; font-size:1rem;">${(prof.name||'?')[0]}</div><div>${escapeHtml(prof.name||'Quelqu\'un')}</div>`;
-      row.addEventListener('click', async ()=>{
-        petitAmiId=id;
+    list.innerHTML = '';
+    ids.forEach(id => {
+      const row = document.createElement('div');
+      row.className = 'friend-pick' + (id === petitAmiId ? ' selected' : '');
+      row.innerHTML = `<div class="avatar" style="width:36px;height:36px;font-size:1.1rem;background:var(--surface-2)">${avatarOf(id)}</div>
+                       <div>${escapeHtml(nameOf(id))}</div>`;
+      row.addEventListener('click', async () => {
+        petitAmiId = id;
         closeSheet('petitAmiSheet');
-        if(db && myId){
-          try{ await db.doc('data/users/'+myId+'/settings').set({petitAmiId:id}); }catch(e){}
-        }
         renderHome();
+        try{ await setDoc(doc(db, 'settings', myId), { petitAmiId: id }); }catch(e){}
       });
       list.appendChild(row);
     });
@@ -526,226 +840,159 @@ async function openPetitAmiSheet(){
   openSheet('petitAmiSheet');
 }
 
-function computeStreak(history){
-  const days=[...new Set(history.map(h=>dayKey(h.at)))];
-  const daySet=new Set(days);
-  let streak=0;
-  let cursor=new Date();
-  if(!daySet.has(dayKey(cursor.getTime()))){
-    cursor.setDate(cursor.getDate()-1);
-    if(!daySet.has(dayKey(cursor.getTime()))) return 0;
-  }
-  while(daySet.has(dayKey(cursor.getTime()))){
-    streak++;
-    cursor.setDate(cursor.getDate()-1);
-  }
-  return streak;
+async function invite(){
+  closeSheet('settingsSheet');
+  const url = location.href.split('?')[0];
+  const text = 'Rejoins-moi sur MoodLove 🩷 on y partage notre humeur du moment : ' + url;
+  try{
+    if(navigator.share){ await navigator.share({ title:'MoodLove', text, url }); return; }
+    await navigator.clipboard.writeText(url);
+    showToast('Lien copié, envoie-le à tes amies 🩷');
+  }catch(e){ showToast(url); }
 }
 
-// Group flame: counts consecutive days where every member of the group
-// (everyone who has ever shared a mood) posted at least one mood that day.
-function computeGroupStreak(history, rosterIds){
-  if(rosterIds.length===0) return 0;
-  const byDay={};
-  history.forEach(h=>{
-    const dk=dayKey(h.at);
-    if(!byDay[dk]) byDay[dk]=new Set();
-    byDay[dk].add(h.uid);
-  });
-  const everyonePosted=(dk)=>{
-    const set=byDay[dk];
-    return !!set && rosterIds.every(id=>set.has(id));
-  };
-  let cursor=new Date();
-  if(!everyonePosted(dayKey(cursor.getTime()))){
-    cursor.setDate(cursor.getDate()-1);
-    if(!everyonePosted(dayKey(cursor.getTime()))) return 0;
-  }
-  let streak=0;
-  while(everyonePosted(dayKey(cursor.getTime()))){
-    streak++;
-    cursor.setDate(cursor.getDate()-1);
-  }
-  return streak;
+async function logout(){
+  closeSheet('settingsSheet');
+  unsubs.forEach(u => { try{ u(); }catch(e){} });
+  unsubs = [];
+  if(refreshTimer){ clearInterval(refreshTimer); refreshTimer = null; }
+  profiles = {}; latestMoods = {}; reactions = {}; recentHistory = [];
+  petitAmiId = null; celebratedKey = null;
+  try{ await signOut(auth); }catch(e){}
 }
 
-function renderStreak(){
-  const roster=Object.keys(latestMoods);
-  document.getElementById('streakNum').textContent = computeGroupStreak(groupHistory, roster);
-}
+/* ---------- Construction de l'UI ---------- */
 
-function renderJournal(){
-  const streak=computeStreak(myHistory);
-  document.getElementById('journalStreakLine').textContent =
-    streak>0 ? `${streak} jour${streak>1?'s':''} de suite à te confier 🔥` : "Partage ton humeur pour démarrer une série ✨";
-
-  const now=new Date();
-  const year=now.getFullYear(), month=now.getMonth();
-  const firstDow=(new Date(year,month,1).getDay()+6)%7;
-  const daysInMonth=new Date(year,month+1,0).getDate();
-  const byDay={};
-  myHistory.forEach(h=>{
-    const d=new Date(h.at);
-    if(d.getFullYear()===year && d.getMonth()===month){
-      const day=d.getDate();
-      if(!byDay[day] || h.at>byDay[day].at) byDay[day]=h;
-    }
-  });
-  const grid=document.getElementById('calGrid');
-  grid.innerHTML='';
-  ['L','M','M','J','V','S','D'].forEach(d=>{
-    const el=document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el);
-  });
-  for(let i=0;i<firstDow;i++){ const e=document.createElement('div'); grid.appendChild(e); }
-  for(let day=1; day<=daysInMonth; day++){
-    const entry=byDay[day];
-    const mood=entry?moodByKey[entry.moodKey]:null;
-    const el=document.createElement('div');
-    el.className='cal-day'+(mood?' has-entry':'');
-    if(mood) el.style.background=mood.color;
-    el.innerHTML=mood?`<span class="em">${mood.emoji}</span><span>${day}</span>`:`<span>${day}</span>`;
-    grid.appendChild(el);
-  }
-
-  const notes=document.getElementById('journalNotes');
-  const withMsg=myHistory.filter(h=>h.message).slice(0,6);
-  notes.innerHTML='';
-  withMsg.forEach(h=>{
-    const d=new Date(h.at);
-    const div=document.createElement('div');
-    div.className='journal-note';
-    div.innerHTML=`<div class="jdate">${d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}</div><div class="jtext">${moodByKey[h.moodKey].emoji} ${escapeHtml(h.message)}</div>`;
-    notes.appendChild(div);
+function buildMoodPicker(){
+  const wrap = $('moodPicker');
+  MOOD_GROUPS.forEach(group => {
+    const label = document.createElement('div');
+    label.className = 'mood-group-label';
+    label.textContent = group.label;
+    wrap.appendChild(label);
+    const grid = document.createElement('div');
+    grid.className = 'mood-grid';
+    group.moods.forEach(m => {
+      const el = document.createElement('div');
+      el.className = 'mood-opt';
+      el.innerHTML = `<span class="em">${m.emoji}</span><span class="lb">${m.label}</span>`;
+      el.addEventListener('click', () => saveMood(m.key));
+      grid.appendChild(el);
+    });
+    wrap.appendChild(grid);
   });
 }
 
-function checkMoodMatch(){
-  if(!petitAmiId || !myId) return;
-  const mine=latestMoods[myId], theirs=latestMoods[petitAmiId];
-  if(!mine || !theirs) return;
-  if(mine.data.moodKey!==theirs.data.moodKey) return;
-  if(Math.abs((mine.data.updatedAt||0)-(theirs.data.updatedAt||0)) > MATCH_WINDOW_MS) return;
-  const key=mine.data.moodKey+':'+mine.data.updatedAt+':'+theirs.data.updatedAt;
-  if(celebratedKey===key) return;
-  let seen=null;
-  try{ seen=localStorage.getItem('moodlove-match'); }catch(e){}
-  if(seen===key) return;
-  celebratedKey=key;
-  try{ localStorage.setItem('moodlove-match',key); }catch(e){}
-  showMatchOverlay(moodByKey[mine.data.moodKey]);
-}
+function bindUI(){
+  $('authSubmit').addEventListener('click', submitAuth);
+  $('authToggle').addEventListener('click', () => setAuthMode(!isSignupMode));
+  $('authPassword').addEventListener('keydown', e => { if(e.key === 'Enter') submitAuth(); });
+  $('authEmail').addEventListener('keydown', e => { if(e.key === 'Enter') $('authPassword').focus(); });
 
-function showMatchOverlay(mood){
-  const overlay=document.getElementById('matchOverlay');
-  document.getElementById('matchText').textContent = `Vous ressentez toutes les deux : ${mood.emoji} ${mood.label}`;
-  overlay.classList.add('show');
-  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(!reduce){
-    for(let i=0;i<14;i++){
-      setTimeout(()=>{
-        const h=document.createElement('div');
-        h.className='heart';
-        h.textContent=['💗','💕','✨','🩷'][Math.floor(Math.random()*4)];
-        h.style.left=(10+Math.random()*80)+'%';
-        overlay.appendChild(h);
-        setTimeout(()=>h.remove(),2700);
-      }, i*120);
-    }
-  }
-  setTimeout(()=>overlay.classList.remove('show'), 3200);
-}
-
-function bindNav(){
-  document.getElementById('navHome').addEventListener('click',()=>{
-    document.getElementById('homeView').style.display='block';
-    document.getElementById('journalView').style.display='none';
-    document.getElementById('navHome').classList.add('active');
-    document.getElementById('navJournal').classList.remove('active');
+  $('navHome').addEventListener('click', () => {
+    $('homeView').style.display = 'block';
+    $('journalView').style.display = 'none';
+    $('navHome').classList.add('active');
+    $('navJournal').classList.remove('active');
   });
-  document.getElementById('navJournal').addEventListener('click',()=>{
-    document.getElementById('homeView').style.display='none';
-    document.getElementById('journalView').style.display='block';
-    document.getElementById('navHome').classList.remove('active');
-    document.getElementById('navJournal').classList.add('active');
+  $('navJournal').addEventListener('click', () => {
+    $('homeView').style.display = 'none';
+    $('journalView').style.display = 'block';
+    $('navJournal').classList.add('active');
+    $('navHome').classList.remove('active');
     renderJournal();
   });
-  document.getElementById('fabBtn').addEventListener('click',()=>{
-    selectedMoodKey=null;
-    document.querySelectorAll('.mood-opt').forEach(o=>o.classList.remove('selected'));
-    document.getElementById('moodMessage').value='';
-    document.getElementById('saveMoodBtn').disabled=true;
-    openSheet('moodSheet');
+  $('fabBtn').addEventListener('click', () => openSheet('moodSheet'));
+  $('inviteBtn').addEventListener('click', invite);
+  $('settingsBtn').addEventListener('click', () => {
+    $('accountHint').textContent = myEmail ? 'Connectée avec ' + myEmail : '';
+    openSheet('settingsSheet');
   });
-  document.getElementById('petitAmiSettingsBtn').addEventListener('click', openPetitAmiSheet);
-  ['moodSheet','petitAmiSheet'].forEach(id=>{
-    document.getElementById(id).addEventListener('click',(e)=>{
-      if(e.target.id===id) closeSheet(id);
-    });
+  $('setPetitAmiRow').addEventListener('click', openPetitAmiSheet);
+  $('setInviteRow').addEventListener('click', invite);
+  $('logoutRow').addEventListener('click', logout);
+  ['moodSheet','petitAmiSheet','settingsSheet'].forEach(id => {
+    $(id).addEventListener('click', e => { if(e.target.id === id) closeSheet(id); });
   });
-  document.getElementById('saveMoodBtn').addEventListener('click', saveMood);
 }
 
-async function saveMood(){
-  if(!selectedMoodKey || !db || !myId) return;
-  const btn=document.getElementById('saveMoodBtn');
-  btn.disabled=true; btn.textContent='...';
-  const message=document.getElementById('moodMessage').value.trim();
-  const now=Date.now();
+function startApp(){
+  $('loadingScreen').classList.add('hidden');
+  $('authScreen').classList.remove('show');
+  $('onboarding').classList.remove('show');
+
+  unsubs.push(onSnapshot(collection(db, 'profiles'), snap => {
+    profiles = {};
+    snap.forEach(d => { profiles[d.id] = d.data(); });
+    renderHome();
+    renderStreak();
+  }));
+
+  unsubs.push(onSnapshot(collection(db, 'moods'), snap => {
+    latestMoods = {};
+    snap.forEach(d => { latestMoods[d.id] = d.data(); });
+    renderHome();
+    checkMoodMatch();
+  }));
+
+  unsubs.push(onSnapshot(collection(db, 'reactions'), snap => {
+    reactions = {};
+    snap.forEach(d => { reactions[d.id] = d.data(); });
+    renderHome();
+  }));
+
+  const cutoff = Date.now() - HISTORY_DAYS * 24 * 60 * 60 * 1000;
+  unsubs.push(onSnapshot(query(collection(db, 'history'), where('at', '>=', cutoff), orderBy('at', 'desc')), snap => {
+    recentHistory = snap.docs.map(d => d.data());
+    renderStreak();
+    if($('journalView').style.display !== 'none') renderJournal();
+  }));
+
+  unsubs.push(onSnapshot(doc(db, 'settings', myId), snap => {
+    const data = snap.data();
+    petitAmiId = (data && data.petitAmiId) || null;
+    renderHome();
+    checkMoodMatch();
+  }));
+
+  refreshTimer = setInterval(renderHome, 60000);
+}
+
+buildMoodPicker();
+buildOnboarding();
+bindUI();
+setAuthMode(false);
+
+onAuthStateChanged(auth, async user => {
+  if(!user){
+    myId = null; myEmail = null;
+    $('loadingScreen').classList.add('hidden');
+    $('onboarding').classList.remove('show');
+    $('authScreen').classList.add('show');
+    $('authSubmit').disabled = false;
+    setAuthMode(isSignupMode);
+    return;
+  }
+  myId = user.uid;
+  myEmail = user.email;
+  $('authScreen').classList.remove('show');
   try{
-    await db.collection('moods').doc(myId).set({moodKey:selectedMoodKey, message, updatedAt:now});
-    await db.collection('history').add({uid:myId, moodKey:selectedMoodKey, message, at:now});
-  }catch(e){}
-  btn.textContent='Partager mon humeur';
-  closeSheet('moodSheet');
-}
-
-async function init(){
-  buildMoodGrid();
-  bindNav();
-
-  db = window.claude ? await window.claude.use('db') : null;
-  userCap = window.claude ? await window.claude.use('user') : null;
-
-  if(userCap){
-    myId = await userCap.id();
+    const prof = await getDoc(doc(db, 'profiles', myId));
+    if(prof.exists()){
+      startApp();
+    } else {
+      $('loadingScreen').classList.add('hidden');
+      $('onboarding').classList.add('show');
+    }
+  }catch(e){
+    $('loadingScreen').innerHTML = '<div class="empty-state">Chargement impossible.<br>Recharge la page.</div>';
+    $('loadingScreen').classList.remove('hidden');
   }
+});
 
-  if(db && myId){
-    unsubSettings = db.doc('data/users/'+myId+'/settings').onSnapshot(snap=>{
-      const data=snap.data();
-      petitAmiId = (data && data.petitAmiId) || null;
-      renderHome();
-      checkMoodMatch();
-    });
-
-    unsubMoods = db.collection('moods').onSnapshot(qs=>{
-      latestMoods={};
-      qs.docs.forEach(d=>{ if(d.exists) latestMoods[d.id]={data:d.data(), id:d.id}; });
-      renderHome();
-      renderStreak();
-      checkMoodMatch();
-    });
-
-    unsubReactions = db.collection('reactions').onSnapshot(qs=>{
-      latestReactions={};
-      qs.docs.forEach(d=>{ if(d.exists) latestReactions[d.id]=d.data(); });
-      renderHome();
-    });
-
-    unsubHistory = db.collection('history').where('uid','==',myId).orderBy('at','desc').limit(60).onSnapshot(qs=>{
-      myHistory = qs.docs.filter(d=>d.exists).map(d=>d.data());
-      if(document.getElementById('journalView').style.display!=='none') renderJournal();
-    });
-
-    unsubGroupHistory = db.collection('history').orderBy('at','desc').limit(500).onSnapshot(qs=>{
-      groupHistory = qs.docs.filter(d=>d.exists).map(d=>d.data());
-      renderStreak();
-    });
-  } else {
-    document.getElementById('friendsList').innerHTML =
-      '<div class="empty-state">Ouvre MoodLove depuis un lien Claude partagé pour synchroniser vos humeurs 🩷</div>';
-  }
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
-
-init();
 </script>
+</body>
+</html>
