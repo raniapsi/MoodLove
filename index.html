@@ -1,0 +1,751 @@
+<title>MoodLove</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@400;500;600;700&family=Caveat:wght@500;600;700&display=swap">
+<style>
+:root{
+  --bg-a:#FFE9F0;
+  --bg-b:#F1E6FF;
+  --surface:#FFFBF8;
+  --surface-2:#FFF1F6;
+  --ink:#4A2E45;
+  --ink-soft:#8C6B87;
+  --rose:#FF6FA0;
+  --rose-deep:#E84A88;
+  --gold:#F0B95F;
+  --border:rgba(74,46,69,0.1);
+  --shadow:rgba(232,74,136,0.22);
+  --sheet-scrim:rgba(74,46,69,0.35);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg-a:#231320;
+    --bg-b:#2A1D3B;
+    --surface:#32202F;
+    --surface-2:#3B2536;
+    --ink:#FBEAF2;
+    --ink-soft:#D3AFC9;
+    --rose:#FF8FB8;
+    --rose-deep:#FFA9CC;
+    --gold:#F0C179;
+    --border:rgba(255,255,255,0.1);
+    --shadow:rgba(0,0,0,0.45);
+    --sheet-scrim:rgba(10,4,9,0.55);
+  }
+}
+:root[data-theme="dark"]{
+  --bg-a:#231320;
+  --bg-b:#2A1D3B;
+  --surface:#32202F;
+  --surface-2:#3B2536;
+  --ink:#FBEAF2;
+  --ink-soft:#D3AFC9;
+  --rose:#FF8FB8;
+  --rose-deep:#FFA9CC;
+  --gold:#F0C179;
+  --border:rgba(255,255,255,0.1);
+  --shadow:rgba(0,0,0,0.45);
+  --sheet-scrim:rgba(10,4,9,0.55);
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:radial-gradient(circle at 30% 0%, var(--bg-b), var(--bg-a) 60%);
+  color:var(--ink);
+  font-family:'Quicksand',sans-serif;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:28px 14px;
+}
+.stage{
+  width:100%;
+  max-width:400px;
+}
+.phone{
+  position:relative;
+  background:var(--surface);
+  border-radius:38px;
+  box-shadow:0 30px 60px -20px var(--shadow), 0 0 0 8px rgba(255,255,255,0.35) inset;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  height:min(780px, 86vh);
+}
+@media (max-width:460px){
+  body{padding:0;}
+  .stage{max-width:100%;}
+  .phone{height:100vh; border-radius:0; box-shadow:none;}
+}
+.notch{
+  position:absolute;
+  top:10px; left:50%; transform:translateX(-50%);
+  width:90px; height:22px; border-radius:20px;
+  background:var(--ink); opacity:.12; z-index:5;
+}
+.app-header{
+  padding:34px 22px 14px;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-shrink:0;
+}
+.brand{
+  display:flex; align-items:center; gap:8px;
+  font-family:'Fredoka',sans-serif; font-weight:600; font-size:1.35rem;
+  color:var(--rose-deep);
+}
+.brand .dot{font-size:1.1rem;}
+.header-actions{display:flex; align-items:center; gap:8px;}
+.streak-chip, .icon-btn{
+  display:flex; align-items:center; gap:4px;
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  color:var(--ink);
+  font-family:'Quicksand',sans-serif; font-weight:700; font-size:.85rem;
+  padding:6px 10px; border-radius:999px;
+  cursor:pointer;
+}
+.icon-btn{padding:7px 9px; font-size:1rem;}
+.icon-btn:focus-visible, .streak-chip:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
+
+.tabs-view{flex:1; overflow-y:auto; padding:4px 20px 110px;}
+.tabs-view::-webkit-scrollbar{width:0;}
+
+.section-label{
+  font-family:'Quicksand',sans-serif; font-weight:700; font-size:.72rem;
+  text-transform:uppercase; letter-spacing:.09em; color:var(--ink-soft);
+  margin:18px 4px 10px;
+}
+.section-label:first-child{margin-top:2px;}
+
+.petit-ami-card{
+  position:relative;
+  border-radius:26px;
+  padding:18px;
+  background:linear-gradient(150deg, var(--surface-2), var(--surface));
+  border:1px solid var(--border);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 35%, transparent);
+  display:flex; align-items:center; gap:14px;
+  cursor:pointer;
+}
+.petit-ami-card .halo{
+  position:absolute; inset:-2px;
+  border-radius:28px;
+  background:conic-gradient(from 0deg, var(--gold), var(--rose), var(--gold));
+  z-index:-1;
+  opacity:.55;
+  filter:blur(6px);
+}
+.avatar{
+  width:52px; height:52px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Fredoka',sans-serif; font-weight:600; font-size:1.4rem;
+  flex-shrink:0; border:2px solid var(--surface);
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+.who-block{flex:1; min-width:0;}
+.who-name{font-family:'Fredoka',sans-serif; font-weight:600; font-size:1rem; display:flex; align-items:center; gap:6px;}
+.who-name .crown{font-size:.85rem;}
+.mood-line{
+  font-family:'Caveat',cursive; font-size:1.25rem; font-weight:600;
+  color:var(--ink); margin-top:2px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.time-ago{font-size:.72rem; color:var(--ink-soft); margin-top:2px;}
+.react-btn{
+  border:none; background:var(--surface); border:1px solid var(--border);
+  width:38px; height:38px; border-radius:50%; font-size:1.1rem; cursor:pointer;
+  flex-shrink:0;
+}
+.react-btn:active{transform:scale(.9);}
+
+.empty-petit-ami{
+  border:1.5px dashed var(--rose);
+  border-radius:22px; padding:16px;
+  display:flex; align-items:center; gap:12px;
+  color:var(--rose-deep); font-weight:600; cursor:pointer;
+  background:var(--surface-2);
+}
+.empty-petit-ami .plus-circle{
+  width:38px; height:38px; border-radius:50%; background:var(--rose);
+  color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0;
+}
+
+.friend-row{
+  display:flex; align-items:center; gap:12px;
+  padding:12px; border-radius:20px;
+  background:var(--surface); border:1px solid var(--border);
+  margin-bottom:10px;
+}
+.friend-row .mood-line{font-size:1.1rem;}
+.reaction-badge{
+  font-size:.68rem; color:var(--rose-deep); margin-top:2px;
+}
+
+.fab{
+  position:absolute; right:20px; bottom:96px;
+  width:58px; height:58px; border-radius:50%;
+  background:linear-gradient(135deg, var(--rose), var(--rose-deep));
+  color:#fff; border:none; font-size:1.7rem; font-weight:600;
+  box-shadow:0 12px 24px -6px var(--shadow);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  z-index:20;
+}
+.fab:active{transform:scale(.94);}
+
+.bottom-nav{
+  position:absolute; left:0; right:0; bottom:0;
+  display:flex; background:var(--surface);
+  border-top:1px solid var(--border);
+  padding:10px 20px calc(14px + env(safe-area-inset-bottom));
+  z-index:15;
+}
+.nav-btn{
+  flex:1; background:none; border:none; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  font-family:'Quicksand',sans-serif; font-weight:700; font-size:.7rem;
+  color:var(--ink-soft);
+}
+.nav-btn .nav-ic{font-size:1.25rem;}
+.nav-btn.active{color:var(--rose-deep);}
+
+.sheet-scrim{
+  position:absolute; inset:0; background:var(--sheet-scrim);
+  z-index:30; display:flex; align-items:flex-end;
+  opacity:0; pointer-events:none; transition:opacity .2s ease;
+}
+.sheet-scrim.open{opacity:1; pointer-events:auto;}
+.sheet{
+  background:var(--surface); width:100%;
+  border-radius:26px 26px 0 0;
+  padding:20px 20px calc(22px + env(safe-area-inset-bottom));
+  transform:translateY(100%); transition:transform .28s cubic-bezier(.2,.9,.3,1);
+  max-height:88%; overflow-y:auto;
+}
+.sheet-scrim.open .sheet{transform:translateY(0);}
+.sheet-handle{width:40px; height:4px; border-radius:4px; background:var(--border); margin:0 auto 14px;}
+.sheet h3{font-family:'Fredoka',sans-serif; margin:0 0 14px; font-size:1.15rem;}
+.mood-grid{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px;
+}
+.mood-opt{
+  border:2px solid var(--border); background:var(--surface-2);
+  border-radius:16px; padding:10px 4px; text-align:center; cursor:pointer;
+}
+.mood-opt .em{font-size:1.5rem; display:block;}
+.mood-opt .lb{font-size:.65rem; font-weight:700; color:var(--ink-soft); margin-top:3px; display:block;}
+.mood-opt.selected{border-color:var(--rose); background:color-mix(in srgb, var(--rose) 14%, var(--surface-2));}
+.sheet textarea{
+  width:100%; border:1.5px solid var(--border); border-radius:14px;
+  padding:10px 12px; font-family:'Quicksand',sans-serif; font-size:.9rem;
+  resize:none; background:var(--surface-2); color:var(--ink); min-height:60px;
+}
+.save-btn{
+  width:100%; margin-top:14px; border:none; border-radius:16px;
+  background:linear-gradient(135deg, var(--rose), var(--rose-deep));
+  color:#fff; font-family:'Fredoka',sans-serif; font-weight:600; font-size:1rem;
+  padding:13px; cursor:pointer;
+}
+.save-btn:disabled{opacity:.5; cursor:default;}
+
+.friend-pick{
+  display:flex; align-items:center; gap:10px; padding:10px;
+  border-radius:14px; border:1.5px solid var(--border); margin-bottom:8px; cursor:pointer;
+}
+.friend-pick.selected{border-color:var(--gold); background:color-mix(in srgb, var(--gold) 16%, var(--surface));}
+
+.calendar-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
+.cal-dow{font-size:.62rem; text-align:center; color:var(--ink-soft); font-weight:700;}
+.cal-day{
+  aspect-ratio:1; border-radius:12px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; font-size:.72rem; font-weight:700;
+  background:var(--surface-2); border:1px solid var(--border); color:var(--ink-soft);
+  cursor:default; gap:2px;
+}
+.cal-day.has-entry{color:#fff; border:none;}
+.cal-day .em{font-size:.9rem;}
+.streak-banner{
+  font-family:'Caveat',cursive; font-size:1.3rem; text-align:center; color:var(--rose-deep);
+  margin:14px 0 4px;
+}
+.journal-note{
+  margin-top:16px; background:var(--surface-2); border-radius:16px; padding:14px;
+  border:1px solid var(--border);
+}
+.journal-note .jdate{font-size:.7rem; color:var(--ink-soft); font-weight:700;}
+.journal-note .jtext{font-family:'Caveat',cursive; font-size:1.2rem; margin-top:2px;}
+
+.match-overlay{
+  position:absolute; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
+  flex-direction:column; background:rgba(74,46,69,0.55); opacity:0; pointer-events:none; transition:opacity .3s;
+  text-align:center; padding:30px;
+}
+.match-overlay.show{opacity:1; pointer-events:auto;}
+.match-overlay h2{font-family:'Fredoka',sans-serif; color:#fff; font-size:1.4rem;}
+.match-overlay p{color:#fff; font-family:'Caveat',cursive; font-size:1.3rem; margin-top:6px;}
+.heart{
+  position:absolute; bottom:-20px; font-size:1.6rem; animation:rise 2.6s ease-in forwards;
+}
+@keyframes rise{
+  0%{transform:translateY(0) scale(.8); opacity:1;}
+  100%{transform:translateY(-620px) scale(1.2); opacity:0;}
+}
+@media (prefers-reduced-motion: reduce){
+  .heart{display:none;}
+  .save-btn,.fab,.react-btn{transition:none;}
+}
+.empty-state{
+  text-align:center; color:var(--ink-soft); padding:40px 20px; font-family:'Quicksand',sans-serif;
+}
+.hint-banner{
+  font-size:.72rem; color:var(--ink-soft); text-align:center; margin-top:10px; line-height:1.5;
+}
+</style>
+
+<div class="stage">
+  <div class="phone" id="phone">
+    <div class="notch"></div>
+    <div class="app-header">
+      <div class="brand"><span class="dot">🩷</span>MoodLove</div>
+      <div class="header-actions">
+        <button class="streak-chip" id="streakChip" title="Jours de suite où tout le monde a partagé son humeur">🔥 <span id="streakNum">0</span></button>
+        <button class="icon-btn" id="petitAmiSettingsBtn" title="Choisir mon petit ami">💕</button>
+      </div>
+    </div>
+
+    <div class="tabs-view" id="homeView">
+      <div class="section-label">Mon petit ami</div>
+      <div id="petitAmiSlot"></div>
+
+      <div class="section-label">Mes amies</div>
+      <div id="friendsList"><div class="empty-state">Personne n'a encore partagé son humeur 🤍</div></div>
+    </div>
+
+    <div class="tabs-view" id="journalView" style="display:none;">
+      <div class="section-label">Ton journal d'humeur</div>
+      <div class="streak-banner" id="journalStreakLine">Continue comme ça 💫</div>
+      <div class="calendar-grid" id="calGrid"></div>
+      <div id="journalNotes"></div>
+    </div>
+
+    <button class="fab" id="fabBtn">+</button>
+
+    <div class="bottom-nav">
+      <button class="nav-btn active" id="navHome"><span class="nav-ic">🏡</span>Accueil</button>
+      <button class="nav-btn" id="navJournal"><span class="nav-ic">📔</span>Journal</button>
+    </div>
+
+    <div class="sheet-scrim" id="moodSheet">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <h3>Comment tu te sens ?</h3>
+        <div class="mood-grid" id="moodGrid"></div>
+        <textarea id="moodMessage" maxlength="80" placeholder="Un petit mot (optionnel)..."></textarea>
+        <button class="save-btn" id="saveMoodBtn" disabled>Partager mon humeur</button>
+      </div>
+    </div>
+
+    <div class="sheet-scrim" id="petitAmiSheet">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <h3>Qui est ton petit ami 💕 ?</h3>
+        <div id="friendPickList"></div>
+        <div class="hint-banner">Il doit d'abord ouvrir MoodLove et partager une humeur une fois pour apparaître ici.</div>
+      </div>
+    </div>
+
+    <div class="match-overlay" id="matchOverlay">
+      <h2>Même vibe, même moment ✨</h2>
+      <p id="matchText"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+const MOODS = [
+  {key:'amour', emoji:'🥰', label:'Amoureuse', color:'#FF6FA0'},
+  {key:'top', emoji:'😄', label:'Trop bien', color:'#F4A65A'},
+  {key:'zen', emoji:'😌', label:'Zen', color:'#B08CF2'},
+  {key:'fatigue', emoji:'😴', label:'Fatiguée', color:'#8FA6D9'},
+  {key:'sensible', emoji:'🥹', label:'Sensible', color:'#FF9EC4'},
+  {key:'stress', emoji:'😤', label:'Stressée', color:'#F17A6B'},
+  {key:'triste', emoji:'😢', label:'Pas ouf', color:'#A98BAE'},
+  {key:'malade', emoji:'🤒', label:'Malade', color:'#8FBF9B'},
+];
+const moodByKey = Object.fromEntries(MOODS.map(m=>[m.key,m]));
+
+let db=null, userCap=null, myId=null;
+let latestMoods={}; // uid -> {data, id}
+let myHistory=[];
+let groupHistory=[];
+let petitAmiId=null;
+let selectedMoodKey=null;
+let unsubMoods=null, unsubReactions=null, unsubHistory=null, unsubSettings=null, unsubGroupHistory=null;
+let latestReactions={};
+let celebratedKey=null;
+const MATCH_WINDOW_MS = 20*60*1000;
+
+function timeAgo(ts){
+  if(!ts) return '';
+  const s=Math.floor((Date.now()-ts)/1000);
+  if(s<60) return "à l'instant";
+  const m=Math.floor(s/60);
+  if(m<60) return m+' min';
+  const h=Math.floor(m/60);
+  if(h<24) return h+' h';
+  const d=Math.floor(h/24);
+  return d+' j';
+}
+function dayKey(ts){
+  const d=new Date(ts);
+  return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+}
+
+function buildMoodGrid(){
+  const grid=document.getElementById('moodGrid');
+  grid.innerHTML='';
+  MOODS.forEach(m=>{
+    const el=document.createElement('div');
+    el.className='mood-opt';
+    el.innerHTML=`<span class="em">${m.emoji}</span><span class="lb">${m.label}</span>`;
+    el.addEventListener('click',()=>{
+      selectedMoodKey=m.key;
+      document.querySelectorAll('.mood-opt').forEach(o=>o.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('saveMoodBtn').disabled=false;
+    });
+    grid.appendChild(el);
+  });
+}
+
+function openSheet(id){ document.getElementById(id).classList.add('open'); }
+function closeSheet(id){ document.getElementById(id).classList.remove('open'); }
+
+async function renderProfilesInto(ids){
+  if(!userCap) return {};
+  const uniq=[...new Set(ids.filter(Boolean))];
+  if(uniq.length===0) return {};
+  return await userCap.profiles(uniq);
+}
+
+async function renderHome(){
+  const ids=Object.keys(latestMoods);
+  const profiles=await renderProfilesInto([...ids, petitAmiId].filter(Boolean));
+
+  // Petit ami slot
+  const slot=document.getElementById('petitAmiSlot');
+  if(!petitAmiId){
+    slot.innerHTML=`<div class="empty-petit-ami" id="setPaBtn"><div class="plus-circle">+</div><div>Ajoute ton petit ami pour épingler son humeur ici</div></div>`;
+    document.getElementById('setPaBtn').addEventListener('click', openPetitAmiSheet);
+  } else {
+    const entry=latestMoods[petitAmiId];
+    const prof=profiles[petitAmiId] || {name:'',avatarUrl:'',color:'#ccc'};
+    const mood=entry ? moodByKey[entry.data.moodKey] : null;
+    slot.innerHTML=`
+      <div class="petit-ami-card" id="paCard">
+        <div class="halo"></div>
+        <div class="avatar" style="background:${mood?mood.color:'#e5d7e2'}; color:#fff;">${mood?mood.emoji:'🤍'}</div>
+        <div class="who-block">
+          <div class="who-name"><span class="crown">👑</span>${escapeHtml(prof.name||'Ton amour')}</div>
+          <div class="mood-line">${entry ? escapeHtml(entry.data.message||mood.label) : "Pas encore d'humeur partagée"}</div>
+          <div class="time-ago">${entry?timeAgo(entry.data.updatedAt):''}</div>
+        </div>
+        ${entry?`<button class="react-btn" data-uid="${petitAmiId}">💌</button>`:''}
+      </div>`;
+    document.getElementById('paCard').addEventListener('click',(e)=>{
+      if(e.target.closest('.react-btn')) return;
+      openPetitAmiSheet();
+    });
+    const rb=slot.querySelector('.react-btn');
+    if(rb) rb.addEventListener('click',(e)=>{e.stopPropagation(); sendReaction(petitAmiId,'💌');});
+  }
+
+  // Friends list (everyone except petit ami), sorted by recency
+  const list=document.getElementById('friendsList');
+  const others=ids.filter(id=>id!==petitAmiId && id!==myId)
+    .map(id=>({id,...latestMoods[id]}))
+    .sort((a,b)=>(b.data.updatedAt||0)-(a.data.updatedAt||0));
+  if(others.length===0){
+    list.innerHTML='<div class="empty-state">Personne d\'autre n\'a encore partagé son humeur 🤍</div>';
+  } else {
+    list.innerHTML='';
+    others.forEach(o=>{
+      const mood=moodByKey[o.data.moodKey];
+      const prof=profiles[o.id]||{name:'',color:'#ccc'};
+      const reaction=latestReactions[o.id];
+      const row=document.createElement('div');
+      row.className='friend-row';
+      row.innerHTML=`
+        <div class="avatar" style="background:${mood.color}; color:#fff;">${mood.emoji}</div>
+        <div class="who-block">
+          <div class="who-name">${escapeHtml(prof.name||'Une amie')}</div>
+          <div class="mood-line">${escapeHtml(o.data.message||mood.label)}</div>
+          <div class="time-ago">${timeAgo(o.data.updatedAt)}</div>
+          ${reaction?`<div class="reaction-badge">${reaction.emoji} reçu</div>`:''}
+        </div>
+        <button class="react-btn" data-uid="${o.id}">💗</button>`;
+      row.querySelector('.react-btn').addEventListener('click',()=>sendReaction(o.id,'💗'));
+      list.appendChild(row);
+    });
+  }
+}
+
+function escapeHtml(s){
+  const d=document.createElement('div'); d.textContent=s??''; return d.innerHTML;
+}
+
+async function sendReaction(toUid, emoji){
+  if(!db || !myId) return;
+  try{
+    await db.collection('reactions').doc(toUid).set({from:myId, emoji, at:Date.now()});
+  }catch(e){}
+}
+
+async function openPetitAmiSheet(){
+  const ids=Object.keys(latestMoods).filter(id=>id!==myId);
+  const profiles=await renderProfilesInto(ids);
+  const list=document.getElementById('friendPickList');
+  if(ids.length===0){
+    list.innerHTML='<div class="empty-state">Aucune amie n\'a encore ouvert MoodLove.</div>';
+  } else {
+    list.innerHTML='';
+    ids.forEach(id=>{
+      const prof=profiles[id]||{name:'Quelqu\'un'};
+      const row=document.createElement('div');
+      row.className='friend-pick'+(id===petitAmiId?' selected':'');
+      row.innerHTML=`<div class="avatar" style="background:var(--rose); color:#fff; width:36px; height:36px; font-size:1rem;">${(prof.name||'?')[0]}</div><div>${escapeHtml(prof.name||'Quelqu\'un')}</div>`;
+      row.addEventListener('click', async ()=>{
+        petitAmiId=id;
+        closeSheet('petitAmiSheet');
+        if(db && myId){
+          try{ await db.doc('data/users/'+myId+'/settings').set({petitAmiId:id}); }catch(e){}
+        }
+        renderHome();
+      });
+      list.appendChild(row);
+    });
+  }
+  openSheet('petitAmiSheet');
+}
+
+function computeStreak(history){
+  const days=[...new Set(history.map(h=>dayKey(h.at)))];
+  const daySet=new Set(days);
+  let streak=0;
+  let cursor=new Date();
+  if(!daySet.has(dayKey(cursor.getTime()))){
+    cursor.setDate(cursor.getDate()-1);
+    if(!daySet.has(dayKey(cursor.getTime()))) return 0;
+  }
+  while(daySet.has(dayKey(cursor.getTime()))){
+    streak++;
+    cursor.setDate(cursor.getDate()-1);
+  }
+  return streak;
+}
+
+// Group flame: counts consecutive days where every member of the group
+// (everyone who has ever shared a mood) posted at least one mood that day.
+function computeGroupStreak(history, rosterIds){
+  if(rosterIds.length===0) return 0;
+  const byDay={};
+  history.forEach(h=>{
+    const dk=dayKey(h.at);
+    if(!byDay[dk]) byDay[dk]=new Set();
+    byDay[dk].add(h.uid);
+  });
+  const everyonePosted=(dk)=>{
+    const set=byDay[dk];
+    return !!set && rosterIds.every(id=>set.has(id));
+  };
+  let cursor=new Date();
+  if(!everyonePosted(dayKey(cursor.getTime()))){
+    cursor.setDate(cursor.getDate()-1);
+    if(!everyonePosted(dayKey(cursor.getTime()))) return 0;
+  }
+  let streak=0;
+  while(everyonePosted(dayKey(cursor.getTime()))){
+    streak++;
+    cursor.setDate(cursor.getDate()-1);
+  }
+  return streak;
+}
+
+function renderStreak(){
+  const roster=Object.keys(latestMoods);
+  document.getElementById('streakNum').textContent = computeGroupStreak(groupHistory, roster);
+}
+
+function renderJournal(){
+  const streak=computeStreak(myHistory);
+  document.getElementById('journalStreakLine').textContent =
+    streak>0 ? `${streak} jour${streak>1?'s':''} de suite à te confier 🔥` : "Partage ton humeur pour démarrer une série ✨";
+
+  const now=new Date();
+  const year=now.getFullYear(), month=now.getMonth();
+  const firstDow=(new Date(year,month,1).getDay()+6)%7;
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const byDay={};
+  myHistory.forEach(h=>{
+    const d=new Date(h.at);
+    if(d.getFullYear()===year && d.getMonth()===month){
+      const day=d.getDate();
+      if(!byDay[day] || h.at>byDay[day].at) byDay[day]=h;
+    }
+  });
+  const grid=document.getElementById('calGrid');
+  grid.innerHTML='';
+  ['L','M','M','J','V','S','D'].forEach(d=>{
+    const el=document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el);
+  });
+  for(let i=0;i<firstDow;i++){ const e=document.createElement('div'); grid.appendChild(e); }
+  for(let day=1; day<=daysInMonth; day++){
+    const entry=byDay[day];
+    const mood=entry?moodByKey[entry.moodKey]:null;
+    const el=document.createElement('div');
+    el.className='cal-day'+(mood?' has-entry':'');
+    if(mood) el.style.background=mood.color;
+    el.innerHTML=mood?`<span class="em">${mood.emoji}</span><span>${day}</span>`:`<span>${day}</span>`;
+    grid.appendChild(el);
+  }
+
+  const notes=document.getElementById('journalNotes');
+  const withMsg=myHistory.filter(h=>h.message).slice(0,6);
+  notes.innerHTML='';
+  withMsg.forEach(h=>{
+    const d=new Date(h.at);
+    const div=document.createElement('div');
+    div.className='journal-note';
+    div.innerHTML=`<div class="jdate">${d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}</div><div class="jtext">${moodByKey[h.moodKey].emoji} ${escapeHtml(h.message)}</div>`;
+    notes.appendChild(div);
+  });
+}
+
+function checkMoodMatch(){
+  if(!petitAmiId || !myId) return;
+  const mine=latestMoods[myId], theirs=latestMoods[petitAmiId];
+  if(!mine || !theirs) return;
+  if(mine.data.moodKey!==theirs.data.moodKey) return;
+  if(Math.abs((mine.data.updatedAt||0)-(theirs.data.updatedAt||0)) > MATCH_WINDOW_MS) return;
+  const key=mine.data.moodKey+':'+mine.data.updatedAt+':'+theirs.data.updatedAt;
+  if(celebratedKey===key) return;
+  let seen=null;
+  try{ seen=localStorage.getItem('moodlove-match'); }catch(e){}
+  if(seen===key) return;
+  celebratedKey=key;
+  try{ localStorage.setItem('moodlove-match',key); }catch(e){}
+  showMatchOverlay(moodByKey[mine.data.moodKey]);
+}
+
+function showMatchOverlay(mood){
+  const overlay=document.getElementById('matchOverlay');
+  document.getElementById('matchText').textContent = `Vous ressentez toutes les deux : ${mood.emoji} ${mood.label}`;
+  overlay.classList.add('show');
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduce){
+    for(let i=0;i<14;i++){
+      setTimeout(()=>{
+        const h=document.createElement('div');
+        h.className='heart';
+        h.textContent=['💗','💕','✨','🩷'][Math.floor(Math.random()*4)];
+        h.style.left=(10+Math.random()*80)+'%';
+        overlay.appendChild(h);
+        setTimeout(()=>h.remove(),2700);
+      }, i*120);
+    }
+  }
+  setTimeout(()=>overlay.classList.remove('show'), 3200);
+}
+
+function bindNav(){
+  document.getElementById('navHome').addEventListener('click',()=>{
+    document.getElementById('homeView').style.display='block';
+    document.getElementById('journalView').style.display='none';
+    document.getElementById('navHome').classList.add('active');
+    document.getElementById('navJournal').classList.remove('active');
+  });
+  document.getElementById('navJournal').addEventListener('click',()=>{
+    document.getElementById('homeView').style.display='none';
+    document.getElementById('journalView').style.display='block';
+    document.getElementById('navHome').classList.remove('active');
+    document.getElementById('navJournal').classList.add('active');
+    renderJournal();
+  });
+  document.getElementById('fabBtn').addEventListener('click',()=>{
+    selectedMoodKey=null;
+    document.querySelectorAll('.mood-opt').forEach(o=>o.classList.remove('selected'));
+    document.getElementById('moodMessage').value='';
+    document.getElementById('saveMoodBtn').disabled=true;
+    openSheet('moodSheet');
+  });
+  document.getElementById('petitAmiSettingsBtn').addEventListener('click', openPetitAmiSheet);
+  ['moodSheet','petitAmiSheet'].forEach(id=>{
+    document.getElementById(id).addEventListener('click',(e)=>{
+      if(e.target.id===id) closeSheet(id);
+    });
+  });
+  document.getElementById('saveMoodBtn').addEventListener('click', saveMood);
+}
+
+async function saveMood(){
+  if(!selectedMoodKey || !db || !myId) return;
+  const btn=document.getElementById('saveMoodBtn');
+  btn.disabled=true; btn.textContent='...';
+  const message=document.getElementById('moodMessage').value.trim();
+  const now=Date.now();
+  try{
+    await db.collection('moods').doc(myId).set({moodKey:selectedMoodKey, message, updatedAt:now});
+    await db.collection('history').add({uid:myId, moodKey:selectedMoodKey, message, at:now});
+  }catch(e){}
+  btn.textContent='Partager mon humeur';
+  closeSheet('moodSheet');
+}
+
+async function init(){
+  buildMoodGrid();
+  bindNav();
+
+  db = window.claude ? await window.claude.use('db') : null;
+  userCap = window.claude ? await window.claude.use('user') : null;
+
+  if(userCap){
+    myId = await userCap.id();
+  }
+
+  if(db && myId){
+    unsubSettings = db.doc('data/users/'+myId+'/settings').onSnapshot(snap=>{
+      const data=snap.data();
+      petitAmiId = (data && data.petitAmiId) || null;
+      renderHome();
+      checkMoodMatch();
+    });
+
+    unsubMoods = db.collection('moods').onSnapshot(qs=>{
+      latestMoods={};
+      qs.docs.forEach(d=>{ if(d.exists) latestMoods[d.id]={data:d.data(), id:d.id}; });
+      renderHome();
+      renderStreak();
+      checkMoodMatch();
+    });
+
+    unsubReactions = db.collection('reactions').onSnapshot(qs=>{
+      latestReactions={};
+      qs.docs.forEach(d=>{ if(d.exists) latestReactions[d.id]=d.data(); });
+      renderHome();
+    });
+
+    unsubHistory = db.collection('history').where('uid','==',myId).orderBy('at','desc').limit(60).onSnapshot(qs=>{
+      myHistory = qs.docs.filter(d=>d.exists).map(d=>d.data());
+      if(document.getElementById('journalView').style.display!=='none') renderJournal();
+    });
+
+    unsubGroupHistory = db.collection('history').orderBy('at','desc').limit(500).onSnapshot(qs=>{
+      groupHistory = qs.docs.filter(d=>d.exists).map(d=>d.data());
+      renderStreak();
+    });
+  } else {
+    document.getElementById('friendsList').innerHTML =
+      '<div class="empty-state">Ouvre MoodLove depuis un lien Claude partagé pour synchroniser vos humeurs 🩷</div>';
+  }
+}
+
+init();
+</script>
