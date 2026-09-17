@@ -1,4 +1,4 @@
-const CACHE = 'moodlove-v3';
+const CACHE = 'moodlove-v4';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', event => {
@@ -10,6 +10,19 @@ self.addEventListener('activate', event => {
     caches.keys()
       .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
+  );
+});
+
+// Un clic sur une notification ramène sur l'appli déjà ouverte, sinon l'ouvre.
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      for(const client of list){
+        if('focus' in client) return client.focus();
+      }
+      if(self.clients.openWindow) return self.clients.openWindow('./');
+    })
   );
 });
 

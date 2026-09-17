@@ -378,6 +378,8 @@ button:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
     <div class="sheet">
       <div class="sheet-handle"></div>
       <h3>Réglages</h3>
+      <div class="settings-row" id="notifRow">🔔 <span id="notifLabel">Activer les notifications</span></div>
+      <div class="hint" id="notifHint" style="text-align:left;margin:-4px 4px 12px;"></div>
       <div class="settings-row" id="setPetitAmiRow">💕 <span>Choisir mon petit ami</span></div>
       <div class="settings-row" id="setFriendsRow">👥 <span>Gérer mes amies</span></div>
       <div class="settings-row" id="setInviteRow">🔗 <span>Envoyer le lien de l'appli</span></div>
@@ -477,7 +479,15 @@ let requestsIn = [], requestsOut = [];
 let petitAmiId = null, obEmoji = null, celebratedKey = null;
 let isSignupMode = false;
 let coreUnsubs = [], friendUnsubs = {};
-let refreshTimer = null, searchTimer = null;
+let refreshTimer = null, searchTimer = null, reminderTimer = null;
+
+const HOUR = 60 * 60 * 1000;
+let notifOn = false;          // l'utilisatrice a activé les notifications
+let swReg = null;
+let knownMoods = {};          // uid -> dernière humeur vue, pour repérer les changements
+let lastReactionAt = 0;       // pour ne pas re-notifier un coeur déjà vu
+let myReactionSeen = false;
+let lastReminderAt = 0;
 
 const $ = id => document.getElementById(id);
 const pairIdOf = (a, b) => (a < b ? a + '_' + b : b + '_' + a);
@@ -509,6 +519,63 @@ function escapeHtml(s){
 }
 const nameOf = uid => (profiles[uid] && profiles[uid].name) || 'Quelqu\'un';
 const avatarOf = uid => (profiles[uid] && profiles[uid].emoji) || '🤍';
+
+/* ---------- Notifications ---------- */
+// Quand l'appli est ouverte, on affiche un petit bandeau ; quand elle est en
+// arrière-plan, une vraie notification du téléphone.
+async function notify(title, body){
+  if(document.visibilityState === 'visible'){ showToast(body); return; }
+  if(!notifOn || !('Notification' in window) || Notification.permission !== 'granted') return;
+  const opts = { body, icon: 'icon-192.png', badge: 'icon-192.png', tag: 'moodlove', renotify: true };
+  try{
+    if(swReg && swReg.showNotification) await swReg.showNotification(title, opts);
+    else new Notification(title, opts);
+  }catch(e){}
+}
+
+async function toggleNotifications(){
+  if(!('Notification' in window)){
+    showToast('Ton navigateur ne gère pas les notifications');
+    return;
+  }
+  if(notifOn){
+    notifOn = false;
+    try{ localStorage.setItem('moodlove-notif', '0'); }catch(e){}
+    showToast('Notifications désactivées');
+    renderSettings();
+    return;
+  }
+  let perm = Notification.permission;
+  if(perm !== 'granted') perm = await Notification.requestPermission();
+  if(perm === 'granted'){
+    notifOn = true;
+    try{ localStorage.setItem('moodlove-notif', '1'); }catch(e){}
+    showToast('Notifications activées 🔔');
+    startReminder();
+  } else {
+    showToast('Notifications refusées par ton téléphone');
+  }
+  renderSettings();
+}
+
+// Rappel : si tu n'as rien partagé depuis une heure, on te le demande.
+function checkReminder(){
+  if(!notifOn || !myId) return;
+  const mine = latestMoods[myId];
+  const sinceMood = mine && mine.updatedAt ? Date.now() - mine.updatedAt : Infinity;
+  if(sinceMood < HOUR) return;
+  if(Date.now() - lastReminderAt < HOUR) return;
+  lastReminderAt = Date.now();
+  try{ localStorage.setItem('moodlove-lastreminder', String(lastReminderAt)); }catch(e){}
+  notify('MoodLove 🩷', 'Ça fait une heure — tu te sens comment maintenant ?');
+}
+function startReminder(){
+  if(reminderTimer) clearInterval(reminderTimer);
+  // Vérification toutes les 5 min : le rappel tombe juste même si le téléphone
+  // a mis l'onglet en veille entre-temps.
+  reminderTimer = setInterval(checkReminder, 5 * 60 * 1000);
+  checkReminder();
+}
 
 /* ---------- Connexion ---------- */
 
@@ -788,6 +855,8 @@ const moodLabel = entry => {
 function renderHome(){
   const mine = latestMoods[myId];
   const myMood = mine ? moodByKey[mine.moodKey] : null;
+  const myHeart = reactions[myId];
+  const heartFresh = myHeart && myHeart.from !== myId && (Date.now() - (myHeart.at || 0)) < 24 * HOUR;
   $('mySlot').innerHTML = `
     <div class="my-card">
       <div class="avatar" style="background:${myMood ? myMood.color : 'var(--surface-2)'}">${myMood ? myMood.emoji : avatarOf(myId)}</div>
@@ -795,6 +864,7 @@ function renderHome(){
         <div class="who-name">${escapeHtml(nameOf(myId))} <span style="color:var(--ink-soft);font-weight:500;font-size:.8rem;">(toi)</span></div>
         <div class="mood-line">${mine ? escapeHtml(moodLabel(mine)) : 'Appuie sur + pour partager ton humeur'}</div>
         <div class="time-ago">${mine ? timeAgo(mine.updatedAt) : ''}</div>
+        ${heartFresh ? `<div class="reaction-badge">💗 ${escapeHtml(nameOf(myHeart.from))} pense à toi · ${timeAgo(myHeart.at)}</div>` : ''}
       </div>
     </div>`;
 
@@ -813,11 +883,11 @@ function renderHome(){
           <div class="who-name">👑 ${escapeHtml(nameOf(petitAmiId))}</div>
           <div class="mood-line">${entry ? escapeHtml(moodLabel(entry)) : "Pas encore d'humeur partagée"}</div>
           <div class="time-ago">${entry ? timeAgo(entry.updatedAt) : ''}</div>
-          ${reac ? `<div class="reaction-badge">${reac.emoji} envoyé</div>` : ''}
+          ${reac && reac.from === myId ? `<div class="reaction-badge">💗 tu lui as dit qu'il te manque</div>` : ''}
         </div>
-        <button class="react-btn" id="paReact">💌</button>
+        <button class="react-btn" id="paReact" title="Il me manque">💗</button>
       </div>`;
-    $('paReact').addEventListener('click', () => sendReaction(petitAmiId, '💌'));
+    $('paReact').addEventListener('click', () => sendHeart(petitAmiId));
   }
 
   const list = $('friendsList');
@@ -842,10 +912,10 @@ function renderHome(){
         <div class="who-name">${escapeHtml(nameOf(o.id))}</div>
         <div class="mood-line">${o.mood ? escapeHtml(moodLabel(o.mood)) : 'Pas encore partagé'}</div>
         <div class="time-ago">${o.mood ? timeAgo(o.mood.updatedAt) : ''}</div>
-        ${reac ? `<div class="reaction-badge">${reac.emoji} envoyé</div>` : ''}
+        ${reac && reac.from === myId ? `<div class="reaction-badge">💗 tu lui as dit qu'elle te manque</div>` : ''}
       </div>
-      <button class="react-btn">💗</button>`;
-    row.querySelector('.react-btn').addEventListener('click', () => sendReaction(o.id, '💗'));
+      <button class="react-btn" title="Elle me manque">💗</button>`;
+    row.querySelector('.react-btn').addEventListener('click', () => sendHeart(o.id));
     list.appendChild(row);
   });
 }
@@ -976,10 +1046,11 @@ function showMatch(mood){
 
 /* ---------- Actions ---------- */
 
-async function sendReaction(toUid, emoji){
+// Le coeur "tu me manques" : il atterrit chez la personne, qui reçoit une notification.
+async function sendHeart(toUid){
   try{
-    await setDoc(doc(db, 'reactions', toUid), { from: myId, emoji, at: Date.now() });
-    showToast(emoji + ' envoyé à ' + nameOf(toUid));
+    await setDoc(doc(db, 'reactions', toUid), { from: myId, emoji: '💗', at: Date.now() });
+    showToast('💗 envoyé à ' + nameOf(toUid) + ' — elle saura qu\'elle te manque');
   }catch(e){ showToast('Envoi impossible'); }
 }
 
@@ -994,6 +1065,20 @@ async function saveMood(moodKey){
     await setDoc(doc(db, 'moodDays', myId), { days: [...days].slice(-MAX_TRACKED_DAYS) });
     showToast(moodByKey[moodKey].emoji + ' humeur partagée');
   }catch(e){ showToast('Impossible de partager, réessaie'); }
+}
+
+function renderSettings(){
+  $('accountHint').textContent = myEmail ? 'Connectée avec ' + myEmail : '';
+  const supported = 'Notification' in window;
+  const denied = supported && Notification.permission === 'denied';
+  $('notifLabel').textContent = notifOn ? 'Notifications activées' : 'Activer les notifications';
+  $('notifHint').textContent = !supported
+    ? "Ton navigateur ne gère pas les notifications."
+    : denied
+      ? "Ton téléphone les bloque : autorise MoodLove dans les réglages du navigateur."
+      : notifOn
+        ? "Rappel toutes les heures, et une alerte quand une amie change d'humeur ou t'envoie un cœur. L'appli doit rester ouverte en arrière-plan."
+        : "Reçois un rappel toutes les heures et une alerte quand quelqu'un change d'humeur.";
 }
 
 function openSheet(id){ $(id).classList.add('open'); }
@@ -1040,6 +1125,7 @@ async function logout(){
   profiles = {}; latestMoods = {}; reactions = {}; moodDays = {};
   myJournal = []; friendIds = []; requestsIn = []; requestsOut = [];
   petitAmiId = null; celebratedKey = null; myProfile = null;
+  knownMoods = {}; lastReactionAt = 0; myReactionSeen = false;
   try{ await signOut(auth); }catch(e){}
 }
 
@@ -1049,6 +1135,7 @@ function stopAllListeners(){
   Object.values(friendUnsubs).flat().forEach(u => { try{ u(); }catch(e){} });
   friendUnsubs = {};
   if(refreshTimer){ clearInterval(refreshTimer); refreshTimer = null; }
+  if(reminderTimer){ clearInterval(reminderTimer); reminderTimer = null; }
 }
 
 /* ---------- Écoute par amie ---------- */
@@ -1076,12 +1163,28 @@ function syncFriendListeners(){
         renderFriendsSheet();
       }, () => {}),
       onSnapshot(doc(db, 'moods', uid), s => {
-        if(s.exists()) latestMoods[uid] = s.data(); else delete latestMoods[uid];
+        const data = s.exists() ? s.data() : null;
+        if(data) latestMoods[uid] = data; else delete latestMoods[uid];
+        // Changement d'humeur d'une amie : on prévient (jamais au premier chargement).
+        if(uid !== myId && data && knownMoods[uid] !== undefined && knownMoods[uid] !== data.moodKey){
+          const m = moodByKey[data.moodKey];
+          if(m) notify(nameOf(uid) + ' a changé d\'humeur', m.emoji + ' ' + m.label);
+        }
+        if(data) knownMoods[uid] = data.moodKey; else delete knownMoods[uid];
         renderHome();
         checkMoodMatch();
       }, () => {}),
       onSnapshot(doc(db, 'reactions', uid), s => {
-        if(s.exists()) reactions[uid] = s.data(); else delete reactions[uid];
+        const data = s.exists() ? s.data() : null;
+        if(data) reactions[uid] = data; else delete reactions[uid];
+        // Un coeur vient d'arriver pour moi (le premier instantané ne notifie pas).
+        if(uid === myId){
+          if(myReactionSeen && data && data.from !== myId && (data.at || 0) > lastReactionAt){
+            notify(nameOf(data.from) + ' pense à toi', 'Tu lui manques ' + (data.emoji || '💗'));
+          }
+          lastReactionAt = (data && data.at) || lastReactionAt;
+          myReactionSeen = true;
+        }
         renderHome();
       }, () => {}),
       onSnapshot(doc(db, 'moodDays', uid), s => {
@@ -1141,9 +1244,10 @@ function bindUI(){
     openSheet('friendsSheet');
   });
   $('settingsBtn').addEventListener('click', () => {
-    $('accountHint').textContent = myEmail ? 'Connectée avec ' + myEmail : '';
+    renderSettings();
     openSheet('settingsSheet');
   });
+  $('notifRow').addEventListener('click', toggleNotifications);
   $('setPetitAmiRow').addEventListener('click', openPetitAmiSheet);
   $('setFriendsRow').addEventListener('click', () => {
     closeSheet('settingsSheet');
@@ -1213,6 +1317,7 @@ function startApp(){
   syncFriendListeners();
   renderHome();
   refreshTimer = setInterval(renderHome, 60000);
+  if(notifOn) startReminder();
 }
 
 async function loadProfile(uid){
@@ -1230,6 +1335,17 @@ buildMoodPicker();
 buildOnboarding();
 bindUI();
 setAuthMode(false);
+
+try{
+  notifOn = localStorage.getItem('moodlove-notif') === '1'
+    && 'Notification' in window && Notification.permission === 'granted';
+  lastReminderAt = Number(localStorage.getItem('moodlove-lastreminder')) || 0;
+}catch(e){}
+
+// Au retour dans l'appli, on vérifie tout de suite si le rappel est dû.
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible') checkReminder();
+});
 
 onAuthStateChanged(auth, async user => {
   if(!user){
@@ -1264,7 +1380,11 @@ onAuthStateChanged(auth, async user => {
 });
 
 if('serviceWorker' in navigator){
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => { swReg = reg; })
+      .catch(() => {});
+  });
 }
 </script>
 </body>
